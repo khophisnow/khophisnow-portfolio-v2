@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 
 const inter = Inter({
@@ -15,7 +16,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://khophisnow-portfolio-v2.vercel.app"),
+  metadataBase: new URL("https://khophisnow.vercel.app"),
   title: "KhophiSnow | Backend API Developer & Ethical Hacking Enthusiast",
   description:
     "Portfolio of Somuah Julius Mcbraham Paapa-Boateng, a backend and API developer building secure systems with NestJS, Express, PostgreSQL, Prisma, and TypeScript.",
@@ -23,7 +24,7 @@ export const metadata: Metadata = {
     title: "KhophiSnow | Backend API Developer",
     description:
       "Secure APIs, multi-tenant platforms, backend architecture, and cybersecurity practice from Cape Coast, Ghana.",
-    url: "https://julius-somuah.netlify.app",
+    url: "https://khophisnow.vercel.app",
     siteName: "KhophiSnow Portfolio",
     images: [
       {
@@ -54,6 +55,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${jetbrainsMono.variable}`}>
         {children}
+        <Analytics />
       </body>
     </html>
   );
