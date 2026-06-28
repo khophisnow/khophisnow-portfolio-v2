@@ -18,6 +18,14 @@ const jetbrainsMono = JetBrains_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL("https://khophisnow.vercel.app"),
   title: "KhophiSnow | Backend API Developer & Ethical Hacking Enthusiast",
+  applicationName: "KhophiSnow Portfolio",
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.png", type: "image/png", sizes: "512x512" },
+    ],
+    apple: [{ url: "/apple-icon.png", sizes: "180x180", type: "image/png" }],
+  },
   description:
     "Portfolio of Somuah Julius Mcbraham Paapa-Boateng, a backend and API developer building secure systems with NestJS, Express, PostgreSQL, Prisma, and TypeScript.",
   openGraph: {
