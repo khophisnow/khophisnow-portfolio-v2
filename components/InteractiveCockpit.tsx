@@ -215,21 +215,56 @@ export function SoundToggle() {
   return <button type="button" aria-label={`Terminal sound ${enabled ? "on" : "off"}`} title={`Terminal sound ${enabled ? "on" : "off"}`} onClick={() => { const next = !enabled; setEnabled(next); if (next) setTimeout(beep, 0); }} className="fixed bottom-[8.75rem] right-5 z-40 hidden size-12 items-center justify-center border border-white/12 bg-ink/90 text-white/60 shadow-terminal backdrop-blur transition hover:border-mint hover:text-mint md:flex">{enabled ? <Volume2 size={18} /> : <VolumeX size={18} />}</button>;
 }
 
+type GitHubFeedItem = {
+  id: string;
+  title: string;
+  summary: string;
+  repo: string;
+  url: string;
+  publishedAt: string;
+};
+
+type GitHubFeed = {
+  updatedAt: string;
+  source: string;
+  items: GitHubFeedItem[];
+};
+
 export function GitHubActivity() {
-  const [events, setEvents] = useState<Array<{ id: string; type: string; repo: { name: string }; created_at: string }>>([]);
+  const [feed, setFeed] = useState<GitHubFeed | null>(null);
   const [status, setStatus] = useState("loading");
+
   useEffect(() => {
-    fetch("https://api.github.com/users/khophisnow/events/public?per_page=5")
-      .then((res) => res.ok ? res.json() : Promise.reject(new Error("GitHub unavailable")))
-      .then((data) => { setEvents(data); setStatus("ready"); })
+    fetch("/github-feed.json", { cache: "no-store" })
+      .then((res) => res.ok ? res.json() : Promise.reject(new Error("Feed unavailable")))
+      .then((data: GitHubFeed) => { setFeed(data); setStatus("ready"); })
       .catch(() => setStatus("offline"));
   }, []);
+
+  const updated = feed?.updatedAt
+    ? new Intl.DateTimeFormat("en", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(feed.updatedAt))
+    : null;
+
   return (
     <div className="border border-white/10 bg-panel/75 p-5">
-      <p className="font-mono text-xs uppercase text-mint">GitHub activity feed</p>
-      {status === "loading" && <p className="mt-4 text-sm text-white/50">Checking public activity...</p>}
-      {status === "offline" && <p className="mt-4 text-sm text-white/50">GitHub feed unavailable right now. The profile link still works.</p>}
-      <div className="mt-4 space-y-3">{events.map((event) => <a key={event.id} href={`https://github.com/${event.repo.name}`} target="_blank" rel="noreferrer" className="block border border-white/10 bg-black/25 p-3 text-sm text-white/65 hover:border-mint"><span className="font-mono text-xs text-cyan">{event.type}</span><span className="mt-1 block font-bold text-white">{event.repo.name}</span></a>)}</div>
+      <div className="flex items-start justify-between gap-4">
+        <div>
+          <p className="font-mono text-xs uppercase text-mint">GitHub activity feed</p>
+          <p className="mt-2 text-sm text-white/50">Recent public work, refreshed hourly from GitHub.</p>
+        </div>
+        {updated && <span className="shrink-0 border border-white/10 px-2 py-1 font-mono text-[10px] uppercase text-white/45">Updated {updated}</span>}
+      </div>
+      {status === "loading" && <p className="mt-4 text-sm text-white/50">Loading saved activity...</p>}
+      {status === "offline" && <p className="mt-4 text-sm text-white/50">Activity feed is unavailable right now. The profile link still works.</p>}
+      <div className="mt-4 space-y-3">
+        {feed?.items.map((event) => (
+          <a key={event.id} href={event.url} target="_blank" rel="noreferrer" className="block border border-white/10 bg-black/25 p-3 text-sm text-white/65 hover:border-mint">
+            <span className="font-mono text-xs text-cyan">{event.title}</span>
+            <span className="mt-1 block font-bold text-white">{event.repo}</span>
+            <span className="mt-2 block text-white/52">{event.summary}</span>
+          </a>
+        ))}
+      </div>
     </div>
   );
 }
