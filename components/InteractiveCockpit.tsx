@@ -244,13 +244,13 @@ export function GitHubActivity() {
   const updated = feed?.updatedAt
     ? new Intl.DateTimeFormat("en", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(feed.updatedAt))
     : null;
+  const formatActivityTime = (value: string) => new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(value));
 
   return (
     <div className="border border-white/10 bg-panel/75 p-5">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="font-mono text-xs uppercase text-mint">GitHub activity feed</p>
-          <p className="mt-2 text-sm text-white/50">Recent public work, refreshed hourly from GitHub.</p>
         </div>
         {updated && <span className="shrink-0 border border-white/10 px-2 py-1 font-mono text-[10px] uppercase text-white/45">Updated {updated}</span>}
       </div>
@@ -259,7 +259,7 @@ export function GitHubActivity() {
       <div className="mt-4 space-y-3">
         {feed?.items.slice(0, 2).map((event) => (
           <a key={event.id} href={event.url} target="_blank" rel="noreferrer" className="block border border-white/10 bg-black/25 p-3 text-sm text-white/65 hover:border-mint">
-            <span className="font-mono text-xs text-cyan">{event.title}</span>
+            <span className="flex items-center justify-between gap-3"><span className="font-mono text-xs text-cyan">{event.title}</span><span className="font-mono text-[10px] uppercase text-white/35">{formatActivityTime(event.publishedAt)}</span></span>
             <span className="mt-1 block font-bold text-white">{event.repo}</span>
             <span className="mt-2 block text-white/52">{event.summary}</span>
           </a>

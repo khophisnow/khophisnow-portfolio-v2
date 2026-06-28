@@ -233,9 +233,9 @@ export const philosophy = [
 export type CaseStudy = (typeof cases)[number];
 
 export const mediaAssets = [
-  { title: "EduManage demo", type: "Live project + screenshot", src: "/images/edumanage-demo.vercel.app_.png", project: "EduManage", liveUrl: "https://edumanage-demo.vercel.app" },
-  { title: "WhatsUpUCC live app", type: "Live project + screenshot", src: "/images/whats-up-ucc.vercel.app_(Nest Hub Max).png", project: "WhatsUpUCC", liveUrl: "https://whats-up-ucc.vercel.app" },
-  { title: "WhatsUpUCC API docs", type: "Saved API docs screen", src: "/images/whats-up-ucc-backend.onrender.com_api-docs_(Nest Hub Max).png", project: "WhatsUpUCC" },
+  { title: "EduManage demo", type: "Live project + screenshot", src: "/images/edumanage-demo.webp", project: "EduManage", liveUrl: "https://edumanage-demo.vercel.app" },
+  { title: "WhatsUpUCC live app", type: "Live project + screenshot", src: "/images/whats-up-ucc.webp", project: "WhatsUpUCC", liveUrl: "https://whats-up-ucc.vercel.app" },
+  { title: "WhatsUpUCC API docs", type: "Saved API docs screen", src: "/images/whats-up-ucc-api-docs.webp", project: "WhatsUpUCC" },
   { title: "ACC/UCC citation", type: "Certificate / recognition", src: "/images/citationFromACC-UCC.jpeg", project: "Leadership" },
 ];
 
@@ -246,10 +246,17 @@ export const certificates = [
 ];
 
 export const writeupPosts = [
-  { slug: "ctf-practice-api-design", title: "How CTF practice changes API design", type: "Security note", body: ["CTF practice trains me to enumerate before assuming. In backend work, that turns into better route review, clearer auth boundaries, and stronger logging.", "The goal is not to make software feel scary. The goal is to make failure paths visible early enough to design around them."] },
-  { slug: "rbac-multi-school-systems", title: "RBAC lessons from multi-school systems", type: "Backend architecture", body: ["Multi-school systems make permission drift obvious. A role is not enough unless the tenant context, route guard, service query, and UI expectation agree.", "EduManage taught me to treat tenant isolation as an invariant that every module has to respect."] },
-  { slug: "mock-data-to-live-systems", title: "From mock data to live systems", type: "Integration story", body: ["Replacing mock data with live workflows is where vague frontend assumptions meet real backend contracts.", "The fastest integrations came from documented endpoints, predictable responses, and tight feedback between frontend and backend debugging."] },
-  { slug: "mr-robot-ctf-notes", title: "Mr. Robot CTF notes", type: "TryHackMe", body: ["A sanitized note from my TryHackMe Mr. Robot practice covering recon, WordPress discovery, credential testing, password cracking, shell handling, and SUID escalation lessons."] },
-  { slug: "runctf-local-challenge", title: "RunCTF local challenge", type: "CITSA practice", body: ["A local boot-to-root practice note covering virtual hosts, directory discovery, exposed configuration, initial access, and privilege escalation thinking."] },
-  { slug: "kiop-samba-lesson", title: "Kiop Samba lesson", type: "CTF practice", body: ["A short note on legacy Samba exposure, service review, and why old internet-facing services are never small risks."] },
+  { slug: "ctf-practice-api-design", title: "How CTF practice changes API design", type: "Security note", readingTime: "3 min read", tags: ["API security", "CTF", "auth"], body: ["CTF practice trains me to enumerate before assuming. In backend work, that turns into better route review, clearer auth boundaries, and stronger logging.", "The goal is not to make software feel scary. The goal is to make failure paths visible early enough to design around them."] },
+  { slug: "rbac-multi-school-systems", title: "RBAC lessons from multi-school systems", type: "Backend architecture", readingTime: "4 min read", tags: ["RBAC", "multi-tenant", "Prisma"], body: ["Multi-school systems make permission drift obvious. A role is not enough unless the tenant context, route guard, service query, and UI expectation agree.", "EduManage taught me to treat tenant isolation as an invariant that every module has to respect."] },
+  { slug: "mock-data-to-live-systems", title: "From mock data to live systems", type: "Integration story", readingTime: "3 min read", tags: ["integration", "contracts", "debugging"], body: ["Replacing mock data with live workflows is where vague frontend assumptions meet real backend contracts.", "The fastest integrations came from documented endpoints, predictable responses, and tight feedback between frontend and backend debugging."] },
+  { slug: "mr-robot-ctf-notes", title: "Mr. Robot CTF notes", type: "TryHackMe", readingTime: "5 min read", tags: ["recon", "WordPress", "privilege path"], body: ["A sanitized note from my TryHackMe Mr. Robot practice covering recon, WordPress discovery, credential testing, password cracking, shell handling, and SUID escalation lessons."] },
+  { slug: "runctf-local-challenge", title: "RunCTF local challenge", type: "CITSA practice", readingTime: "4 min read", tags: ["virtual hosts", "SUID", "local lab"], body: ["A local boot-to-root practice note covering virtual hosts, directory discovery, exposed configuration, initial access, and privilege escalation thinking."] },
+  { slug: "kiop-samba-lesson", title: "Kiop Samba lesson", type: "CTF practice", readingTime: "3 min read", tags: ["legacy services", "Samba", "patching"], body: ["A short note on legacy Samba exposure, service review, and why old internet-facing services are never small risks."] },
+];
+
+export const projectEvidence = [
+  { project: "EduManage", label: "Access boundaries", detail: "Role guards, resolved permissions, and school-aware service queries keep workflows scoped to the right tenant." },
+  { project: "EduManage", label: "Integration proof", detail: "Swagger contracts, seed data, health checks, and tests make frontend/backend integration easier to verify." },
+  { project: "WhatsUpUCC", label: "Public API hygiene", detail: "JWT guards, request tracking, CORS configuration, rate limiting, and API docs support safer public-facing usage." },
+  { project: "WhatsUpUCC", label: "Community safety", detail: "Moderation, media, notifications, and admin workflows are part of the product design, not afterthoughts." },
 ];

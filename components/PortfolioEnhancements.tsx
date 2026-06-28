@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import Link from "next/link";
 import { BarChart3, CheckCircle2, Database, KeyRound, Maximize2, Send, ShieldCheck, UserCheck, UserRound, Workflow, X } from "lucide-react";
 import { cases, certificates, mediaAssets } from "@/lib/portfolio-data";
@@ -149,8 +150,70 @@ export function CertificateActivitySection({ activity }: { activity: React.React
 }
 
 export function ContactForm() {
-  const endpoint = process.env.NEXT_PUBLIC_FORMSPREE_ENDPOINT || "";
-  return <form action={endpoint || "mailto:juliusmcbrahamsomuah@gmail.com"} method={endpoint ? "POST" : "GET"} onSubmit={() => trackEvent("contact_form_submit", { endpoint: endpoint ? "formspree" : "mailto" })} className="border border-white/10 bg-panel/70 p-5"><p className="font-mono text-xs uppercase text-mint">Contact form</p><div className="mt-4 grid gap-3"><input name="name" placeholder="Name" className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint" /><input name="email" type="email" placeholder="Email" className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint" /><textarea name="message" placeholder="What should we build or secure?" rows={5} className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint" /><button className="inline-flex items-center justify-center gap-2 bg-mint px-4 py-3 font-bold text-ink hover:bg-white"><Send size={17} />Send message</button></div>{!endpoint && <p className="mt-3 text-xs text-white/45">Form delivery can be connected when the site is hosted. For now this opens email.</p>}</form>;
+  const [intent, setIntent] = useState("Backend/API opportunity");
+  const [status, setStatus] = useState<"idle" | "sending" | "sent" | "fallback" | "error">("idle");
+  const [message, setMessage] = useState("");
+  const statusClass = status === "sent" ? "text-mint" : status === "error" ? "text-amber" : "text-white/50";
+
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const payload = {
+      name: String(formData.get("name") || ""),
+      email: String(formData.get("email") || ""),
+      intent,
+      message: String(formData.get("message") || ""),
+    };
+
+    setStatus("sending");
+    setMessage("");
+    trackEvent("contact_form_submit", { intent });
+
+    const response = await fetch("/api/contact", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    }).catch(() => null);
+
+    const result = response ? await response.json().catch(() => ({})) : {};
+
+    if (response?.ok && result.ok) {
+      setStatus("sent");
+      setMessage("Message sent. I will reply from my email.");
+      form.reset();
+      return;
+    }
+
+    if (result.fallback) {
+      setStatus("fallback");
+      setMessage("Opening email so the message can still reach me.");
+      window.location.href = result.fallback;
+      return;
+    }
+
+    setStatus("error");
+    setMessage(result.error || "Message could not be sent right now.");
+  }
+
+  return (
+    <form onSubmit={submit} className="border border-white/10 bg-panel/70 p-5">
+      <p className="font-mono text-xs uppercase text-mint">Contact form</p>
+      <div className="mt-4 grid gap-3">
+        <select value={intent} onChange={(event) => setIntent(event.target.value)} className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint">
+          <option>Backend/API opportunity</option>
+          <option>Secure system review</option>
+          <option>Project collaboration</option>
+          <option>Mentorship or training</option>
+        </select>
+        <input name="name" required placeholder="Name" className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint" />
+        <input name="email" required type="email" placeholder="Email" className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint" />
+        <textarea name="message" required placeholder="What should we build or secure?" rows={5} className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint" />
+        <button disabled={status === "sending"} className="inline-flex items-center justify-center gap-2 bg-mint px-4 py-3 font-bold text-ink hover:bg-white disabled:cursor-wait disabled:opacity-60"><Send size={17} />{status === "sending" ? "Sending..." : "Send message"}</button>
+      </div>
+      {message && <p className={`mt-3 text-xs ${statusClass}`}>{message}</p>}
+    </form>
+  );
 }
 
 export function DashboardPreviewLink() { return <a href="/dashboard" className="inline-flex items-center gap-2 border border-cyan/30 px-4 py-3 font-bold text-cyan hover:bg-cyan hover:text-ink"><BarChart3 size={17} />Open control room</a>; }

@@ -60,14 +60,18 @@ const events = await response.json();
 const feed = {
   updatedAt: new Date().toISOString(),
   source: `https://github.com/${username}`,
-  items: events.slice(0, 6).map((event) => ({
-    id: event.id,
-    title: eventLabels[event.type] || "GitHub activity",
-    summary: summarize(event),
-    repo: event.repo?.name || username,
-    url: event.repo?.name ? `https://github.com/${event.repo.name}` : `https://github.com/${username}`,
-    publishedAt: event.created_at,
-  })),
+  items: events.slice(0, 6).map((event) => {
+    const repo = event.repo?.name || username;
+    const isPortfolio = repo.includes("portfolio");
+    return {
+      id: event.id,
+      title: isPortfolio && event.type === "PushEvent" ? "Portfolio update" : eventLabels[event.type] || "GitHub activity",
+      summary: summarize(event),
+      repo,
+      url: event.repo?.name ? `https://github.com/${event.repo.name}` : `https://github.com/${username}`,
+      publishedAt: event.created_at,
+    };
+  }),
 };
 
 await mkdir("public", { recursive: true });

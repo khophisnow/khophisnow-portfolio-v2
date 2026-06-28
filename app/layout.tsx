@@ -36,9 +36,9 @@ export const metadata: Metadata = {
     siteName: "KhophiSnow Portfolio",
     images: [
       {
-        url: "/images/khophisnow-avatar.jpeg",
-        width: 800,
-        height: 800,
+        url: "/opengraph-image",
+        width: 1200,
+        height: 630,
         alt: "Somuah Julius Mcbraham Paapa-Boateng",
       },
     ],
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
     title: "KhophiSnow | Backend API Developer",
     description:
       "Backend/API developer and cybersecurity enthusiast building secure systems.",
-    images: ["/images/khophisnow-avatar.jpeg"],
+    images: ["/opengraph-image"],
   },
 };
 
