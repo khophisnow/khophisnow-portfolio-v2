@@ -257,7 +257,7 @@ export function GitHubActivity() {
       {status === "loading" && <p className="mt-4 text-sm text-white/50">Loading saved activity...</p>}
       {status === "offline" && <p className="mt-4 text-sm text-white/50">Activity feed is unavailable right now. The profile link still works.</p>}
       <div className="mt-4 space-y-3">
-        {feed?.items.map((event) => (
+        {feed?.items.slice(0, 2).map((event) => (
           <a key={event.id} href={event.url} target="_blank" rel="noreferrer" className="block border border-white/10 bg-black/25 p-3 text-sm text-white/65 hover:border-mint">
             <span className="font-mono text-xs text-cyan">{event.title}</span>
             <span className="mt-1 block font-bold text-white">{event.repo}</span>
