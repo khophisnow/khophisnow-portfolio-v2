@@ -1,0 +1,12 @@
+# How CTF practice changes API design
+
+CTF practice trains me to enumerate before assuming. In backend work, that habit turns into better route review, clearer auth boundaries, and stronger logging.
+
+## What transfers into backend engineering
+
+- Check what is exposed before trusting what is documented.
+- Treat authentication as a lifecycle, not a single endpoint.
+- Make failure states visible through logs, status codes, and tests.
+- Design endpoints so misuse is harder than correct use.
+
+The goal is not to make software feel scary. The goal is to make failure paths visible early enough to design around them.

@@ -1,0 +1,15 @@
+# RBAC lessons from multi-school systems
+
+Multi-school systems make permission drift obvious. A role is not enough unless the tenant context, route guard, service query, and UI expectation agree.
+
+## The invariant
+
+Tenant isolation must be true at every layer:
+
+- Request authentication
+- Permission resolution
+- Service-level filtering
+- Database query scope
+- Frontend access control
+
+EduManage taught me to treat tenant isolation as an invariant every module has to respect.
