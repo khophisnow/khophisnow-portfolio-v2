@@ -1,7 +1,6 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
 import { writeupPosts } from "@/lib/portfolio-data";
+import { WriteupBackLink } from "@/components/WriteupBackLink";
 
 const mdxImports = {
   "ctf-practice-api-design": () => import("@/content/writeups/ctf-practice-api-design.mdx"),
@@ -32,10 +31,7 @@ export default async function WriteupPage({ params }: { params: Promise<{ slug: 
   return (
     <main className="scanline min-h-screen bg-ink text-white">
       <section className="mx-auto max-w-3xl px-5 py-16">
-        <Link href="/#writeups" className="inline-flex items-center gap-2 text-sm font-bold text-mint hover:text-white">
-          <ArrowLeft size={16} />
-          Back to writeups
-        </Link>
+<WriteupBackLink />
         <p className="mt-12 font-mono text-sm text-cyan">{post.type}</p>
         <article className="mt-4">
           <Content />

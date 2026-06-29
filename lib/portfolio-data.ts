@@ -20,7 +20,7 @@ import {
   Users,
 } from "lucide-react";
 
-export const navItems = ["Identity", "Modes", "Status", "Case Files", "Evidence", "Lab", "Writeups", "Contact"];
+export const navItems = ["Identity", "Modes", "Status", "Case Files", "Evidence", "Lab", "Writeups", "WaskiZone", "Contact"];
 
 export const proof = [
   { value: "100+", label: "API endpoints", detail: "Designed, integrated, tested, and documented" },
@@ -158,8 +158,8 @@ export const writeups = [
 
 export const timeline = [
   { label: "Robotics/STEM", detail: "Curiosity became hands-on electronics, Arduino, and teaching." },
-  { label: "Web development", detail: "HTML, CSS, JavaScript, PHP, React, and practical product interfaces." },
-  { label: "Backend systems", detail: "NestJS, Express, PostgreSQL, Prisma, APIs, auth, and testing." },
+  { label: "Frontend development", detail: "Next.js, React, TypeScript, Tailwind CSS, and practical product interfaces." },
+  { label: "Backend systems", detail: "NestJS, Express, PostgreSQL, Prisma, REST APIs, authentication, RBAC, and testing." },
   { label: "Cybersecurity", detail: "TryHackMe, CTFs, Linux enumeration, privilege escalation, and API risk." },
   { label: "Secure systems", detail: "Building with both product delivery and attack surface in mind." },
 ];
@@ -200,6 +200,7 @@ export const downloads = [
   { label: "Download CV", href: "/cv/somuah-julius-software-developer-cv-2026.pdf", icon: Download },
   { label: "GitHub", href: "https://github.com/khophisnow", icon: Github },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/khophisnow", icon: Linkedin },
+  { label: "WaskiZone Services", href: "/waskizone", icon: Code2 },
   { label: "WhatsUpUCC API Docs", href: "https://whats-up-ucc-backend.onrender.com/api-docs/", icon: FileJson },
 ];
 
@@ -221,6 +222,7 @@ export const commandActions = [
   { label: "Open security lab", href: "#lab", hint: "g l" },
   { label: "Download CV", href: "/cv/somuah-julius-software-developer-cv-2026.pdf", hint: "g v" },
   { label: "GitHub", href: "https://github.com/khophisnow", hint: "g h" },
+  { label: "WaskiZone services", href: "/waskizone", hint: "g w" },
   { label: "Contact", href: "#contact", hint: "g c" },
 ];
 
@@ -260,3 +262,121 @@ export const projectEvidence = [
   { project: "WhatsUpUCC", label: "Public API hygiene", detail: "JWT guards, request tracking, CORS configuration, rate limiting, and API docs support safer public-facing usage." },
   { project: "WhatsUpUCC", label: "Community safety", detail: "Moderation, media, notifications, and admin workflows are part of the product design, not afterthoughts." },
 ];
+
+export const waskiZone = {
+  name: "WaskiZone",
+  tagline: "Practical software. Security-minded systems.",
+  positioning: "WaskiZone designs, builds, deploys, and secures web platforms for founders, schools, clubs, and small teams that need reliable software with clear ownership and stronger security habits.",
+  activeOffer: "Services cover software development, backend/API engineering, dashboards, technical training, and authorized cybersecurity support such as API security review, hardening guidance, and defensive security training.",
+};
+
+export const waskiServices = [
+  { title: "Backend API Engineering", status: "Available", detail: "REST APIs, authentication, roles, database workflows, documentation, testing, and deployment-ready backend modules.", proof: "Best for products that need reliable data, user accounts, permissions, and integration-ready APIs." },
+  { title: "Full-Stack Web Applications", status: "Available", detail: "Responsive interfaces, dashboards, admin panels, portals, and product workflows connected to real backend services.", proof: "Best for founders, clubs, schools, community platforms, and small businesses." },
+  { title: "Dashboards & Internal Tools", status: "Available", detail: "Operational dashboards, forms, tables, filters, reports, role-aware views, and admin workflows for repeated work.", proof: "Best for teams replacing manual tracking with structured software." },
+  { title: "Deployment & Maintenance", status: "Available", detail: "Bug fixes, API cleanup, documentation, Vercel/Render deployment support, performance passes, and handover notes.", proof: "Best for existing projects that need to become stable, presentable, and easier to maintain." },
+  { title: "Cybersecurity Support", status: "Authorized scope", detail: "API security review, access-control review, basic web hardening, security-aware code review, and defensive recommendations for owned systems.", proof: "Best for teams that want safer software without pretending security is an afterthought." },
+  { title: "Technical Training", status: "Available", detail: "Practical web development, Git/GitHub, backend foundations, API security basics, Arduino/STEM, and project-based sessions.", proof: "Best for schools, clubs, bootcamps, beginner developers, and technical communities." },
+];
+
+export const waskiPackages = [
+  { name: "Launch Presence", price: "Starter", detail: "A professional website or organization page with clear messaging, contact flow, responsive design, and deployment setup.", items: ["Brand-aligned pages", "Contact flow", "Responsive build", "Deployment setup"] },
+  { name: "API Foundation", price: "Core", detail: "A backend foundation for products that need authentication, roles, database workflows, and API documentation.", items: ["Auth + roles", "Database schema", "REST endpoints", "API docs"] },
+  { name: "Secure Product Build", price: "Custom", detail: "A fuller build for dashboards, portals, school systems, event platforms, or internal tools with security-aware delivery.", items: ["Frontend + backend", "Admin workflows", "Security checklist", "Launch support"] },
+  { name: "Security Review", price: "Scoped", detail: "Authorized review for owned web apps or APIs, focused on access control, configuration, exposed routes, and practical hardening.", items: ["Scope agreement", "Risk notes", "Hardening actions", "Summary report"] },
+];
+
+export const waskiProcess = [
+  "Discovery: define the users, business problem, risks, existing systems, and success criteria.",
+  "Architecture: map pages, data, roles, integrations, security boundaries, and deployment requirements.",
+  "Build: deliver in visible checkpoints with clear feedback points and working increments.",
+  "Validate: test core workflows, review access boundaries, document usage, and prepare deployment.",
+  "Launch: deploy, hand over, monitor early issues, and plan the next improvement cycle.",
+];
+
+export const waskiServiceDetails = [
+  {
+    slug: "backend-api-engineering",
+    title: "Backend API Engineering",
+    summary: "REST APIs, authentication, roles, database workflows, OpenAPI documentation, tests, and deployment-ready backend foundations.",
+    goodFor: ["SaaS ideas", "school systems", "dashboards", "event platforms", "internal tools"],
+    deliverables: ["API route map", "auth and role model", "database schema", "OpenAPI documentation", "test-ready endpoints", "deployment notes"],
+    proof: "Backed by EduManage and WhatsUpUCC backend work across auth, roles, modules, and public API documentation.",
+  },
+  {
+    slug: "full-stack-web-applications",
+    title: "Full-Stack Web Applications",
+    summary: "Responsive product interfaces connected to real data, admin workflows, APIs, dashboards, and deployment-ready pages.",
+    goodFor: ["founders", "clubs", "student groups", "communities", "small teams"],
+    deliverables: ["responsive UI", "backend connection", "forms and flows", "admin screens", "deployment", "handover notes"],
+    proof: "Built and integrated production-style flows across portfolio, campus, and academic management systems.",
+  },
+  {
+    slug: "dashboards-and-internal-tools",
+    title: "Dashboards & Internal Tools",
+    summary: "Internal panels, data views, role-aware screens, status dashboards, reports, and operational tools for repeated work.",
+    goodFor: ["operations", "school admins", "team leads", "event managers", "project owners"],
+    deliverables: ["dashboard layout", "role-aware views", "data tables", "status cards", "filters", "deployment checklist"],
+    proof: "Built around the same thinking used in EduManage modules, roles, reports, and operational views.",
+  },
+  {
+    slug: "cybersecurity-support",
+    title: "Cybersecurity Support",
+    summary: "Authorized API and web security review, access-control checks, hardening guidance, and defensive security training for owned systems.",
+    goodFor: ["owned web apps", "backend APIs", "student systems", "internal tools", "training groups"],
+    deliverables: ["scope agreement", "risk findings", "hardening checklist", "access-control notes", "remediation guidance", "summary report"],
+    proof: "Grounded in CTF practice, API security thinking, backend authorization work, and defensive system design.",
+  },
+  {
+    slug: "technical-training",
+    title: "Technical Training",
+    summary: "Practical training for web development, Git/GitHub, backend foundations, API security basics, Arduino/STEM, and beginner project thinking.",
+    goodFor: ["clubs", "schools", "bootcamps", "beginner developers", "STEM groups"],
+    deliverables: ["training outline", "project exercises", "live sessions", "debug support", "resources", "progress plan"],
+    proof: "Grounded in CAS-7 Technology, Amalitech Coding Club, robotics/STEM, and beginner developer mentoring work.",
+  },
+] as const;
+
+export const waskiEstimator = [
+  { answer: "We need a professional public website", result: "Launch Presence" },
+  { answer: "We need auth, roles, APIs, or stored data", result: "API Foundation" },
+  { answer: "We need dashboards, workflows, and admin control", result: "Secure Product Build" },
+  { answer: "We need our web app/API reviewed or hardened", result: "Security Review" },
+];
+
+export const waskiProposalPreview = [
+  "Problem summary, users, and business goal",
+  "Recommended pages, modules, user roles, and workflows",
+  "Backend/API, database, and integration plan where needed",
+  "Security considerations for access control, validation, and deployment",
+  "Timeline, milestones, support expectations, and handover plan",
+];
+
+export const waskiBeforeAfter = [
+  { before: "Unclear product idea", after: "Defined scope, users, workflows, roles, and launch path" },
+  { before: "Unstructured backend", after: "Documented API, database model, auth boundaries, and deployment notes" },
+  { before: "Manual tracking", after: "Dashboard, forms, reports, admin views, and repeatable operations" },
+  { before: "Unknown security posture", after: "Scoped risk notes, hardening actions, and defensive recommendations" },
+];
+
+export const waskiOnboarding = [
+  "Initial inquiry with the project goal, current state, timeline, and ownership scope.",
+  "Discovery call or message thread to confirm users, workflows, risks, and first milestone.",
+  "Proposal or scope note with deliverables, assumptions, timeline, and support terms.",
+  "Build or review phase with checkpoints, feedback, and documented decisions.",
+  "Deployment, handover, security notes, and optional maintenance or training support.",
+];
+
+export const waskiFaqs = [
+  { q: "Does WaskiZone offer cybersecurity services?", a: "Yes, within clear authorized scope. Current services focus on API security review, access-control review, web hardening guidance, defensive training, and practical remediation for systems you own or are allowed to test." },
+  { q: "Can WaskiZone build both frontend and backend?", a: "Yes. The strongest offer is backend/API engineering, but WaskiZone can deliver full-stack web applications, dashboards, admin tools, and deployment-ready websites." },
+  { q: "Who is the best fit for WaskiZone?", a: "Founders, schools, clubs, student groups, small teams, and organizations that need practical software, clear communication, and security-aware delivery." },
+  { q: "Are prices fixed?", a: "Packages are starting points. Final pricing depends on scope, pages, data complexity, integrations, timeline, security review depth, and support needs." },
+  { q: "Can WaskiZone maintain an existing project?", a: "Yes. Maintenance can include bug fixes, API cleanup, documentation, deployment support, hardening recommendations, and small feature improvements." },
+];
+
+export const waskiBrandGuidelines = {
+  colors: ["near-black / deep navy", "mint green", "cyan blue", "controlled red accent", "white / soft gray"],
+  voice: ["practical", "technical", "trustworthy", "direct", "security-aware"],
+  usage: ["Use WaskiZone for client-facing software and cybersecurity services", "Use W4sk1Z0n3 for the cybersecurity identity and lab-facing materials", "Use transparent logo assets inside the website UI", "Keep claims scoped, authorized, and evidence-based"],
+};

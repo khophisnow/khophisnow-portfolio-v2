@@ -172,6 +172,7 @@ export function CommandPalette() {
 
 export function ContactIntentSelector() {
   const intents = [
+    { label: "WaskiZone project", subject: "WaskiZone project inquiry" },
     { label: "Hire for backend", subject: "Backend/API opportunity" },
     { label: "Collaborate", subject: "Project collaboration" },
     { label: "Mentorship", subject: "Mentorship or training request" },
@@ -230,20 +231,39 @@ type GitHubFeed = {
   items: GitHubFeedItem[];
 };
 
+function formatRelativeUpdate(value: string, now: number) {
+  const diff = Math.max(0, now - new Date(value).getTime());
+  const minutes = Math.floor(diff / 60000);
+  if (minutes < 1) return "just now";
+  if (minutes < 60) return `${minutes}m ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(value));
+}
+
 export function GitHubActivity() {
   const [feed, setFeed] = useState<GitHubFeed | null>(null);
   const [status, setStatus] = useState("loading");
+  const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    fetch("/github-feed.json", { cache: "no-store" })
+    fetch("/api/github-feed", { cache: "no-store" })
       .then((res) => res.ok ? res.json() : Promise.reject(new Error("Feed unavailable")))
       .then((data: GitHubFeed) => { setFeed(data); setStatus("ready"); })
       .catch(() => setStatus("offline"));
   }, []);
 
-  const updated = feed?.updatedAt
-    ? new Intl.DateTimeFormat("en", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" }).format(new Date(feed.updatedAt))
-    : null;
+  useEffect(() => {
+    const timer = window.setInterval(() => setNow(Date.now()), 60000);
+    return () => window.clearInterval(timer);
+  }, []);
+
+  const updated = feed?.updatedAt ? formatRelativeUpdate(feed.updatedAt, now) : null;
+  const updatedTitle = feed?.updatedAt
+    ? new Intl.DateTimeFormat("en", { dateStyle: "medium", timeStyle: "short" }).format(new Date(feed.updatedAt))
+    : undefined;
   const formatActivityTime = (value: string) => new Intl.DateTimeFormat("en", { month: "short", day: "numeric" }).format(new Date(value));
 
   return (
@@ -252,7 +272,7 @@ export function GitHubActivity() {
         <div>
           <p className="font-mono text-xs uppercase text-mint">GitHub activity feed</p>
         </div>
-        {updated && <span className="shrink-0 border border-white/10 px-2 py-1 font-mono text-[10px] uppercase text-white/45">Updated {updated}</span>}
+        {updated && <span title={updatedTitle} className="shrink-0 border border-white/10 px-2 py-1 font-mono text-[10px] uppercase text-white/45">Feed checked {updated}</span>}
       </div>
       {status === "loading" && <p className="mt-4 text-sm text-white/50">Loading saved activity...</p>}
       {status === "offline" && <p className="mt-4 text-sm text-white/50">Activity feed is unavailable right now. The profile link still works.</p>}
