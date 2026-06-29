@@ -35,7 +35,7 @@ export function WriteupIndex({ posts }: { posts: WriteupPost[] }) {
       </label>
       <div className="mt-5 grid gap-4">
         {filtered.map((post) => (
-          <Link key={post.slug} href={`/writeups/${post.slug}`} className="group border border-white/10 bg-black/25 p-4 transition hover:border-mint">
+          <Link key={post.slug} href={`/writeups/${post.slug}?from=library`} className="group border border-white/10 bg-black/25 p-4 transition hover:border-mint">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <p className="font-mono text-xs text-cyan">{post.type} / {post.readingTime}</p>
               <ArrowUpRight className="text-white/35 transition group-hover:text-mint" size={16} />

@@ -8,15 +8,9 @@ export function WriteupBackLink() {
   const router = useRouter();
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
-    try {
-      const referrer = document.referrer ? new URL(document.referrer) : null;
-      if (referrer && referrer.origin === window.location.origin && referrer.pathname === "/writeups") {
-        event.preventDefault();
-        router.push("/writeups");
-      }
-    } catch {
-      // Keep the default home-section link.
-    }
+    const source = new URL(window.location.href).searchParams.get("from");
+    event.preventDefault();
+    router.push(source === "library" ? "/writeups" : "/#writeups");
   };
 
   return (
