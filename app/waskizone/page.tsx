@@ -17,6 +17,7 @@ import {
   Wrench,
 } from "lucide-react";
 import { waskiBeforeAfter, waskiFaqs, waskiOnboarding, waskiPackages, waskiProposalPreview, waskiServiceDetails, waskiServices, waskiZone } from "@/lib/portfolio-data";
+import { WaskiZoneIntro } from "@/components/WaskiZoneIntro";
 
 const serviceIcons = [Code2, Layers3, Database, Wrench, ShieldCheck, GraduationCap];
 
@@ -80,6 +81,7 @@ export const metadata = {
 export default function WaskiZonePage() {
   return (
     <main className="scanline min-h-screen bg-ink text-white">
+      <WaskiZoneIntro />
       <div className="cyber-grid pointer-events-none absolute inset-x-0 top-0 h-[760px]" />
       <header className="relative z-10 border-b border-white/10 bg-ink/88 backdrop-blur-xl">
         <nav className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
