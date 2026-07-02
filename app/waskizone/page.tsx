@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { waskiBeforeAfter, waskiFaqs, waskiOnboarding, waskiPackages, waskiProposalPreview, waskiServiceDetails, waskiServices, waskiZone } from "@/lib/portfolio-data";
 import { WaskiZoneIntro } from "@/components/WaskiZoneIntro";
+import { WaskiCaseStudyProof, WaskiHowWeWork, WaskiProposalFlow, WaskiServiceConfigurator, WaskiTrustSection } from "@/components/PortfolioPhase";
 
 const serviceIcons = [Code2, Layers3, Database, Wrench, ShieldCheck, GraduationCap];
 
@@ -146,6 +147,8 @@ export default function WaskiZonePage() {
         </div>
       </section>
 
+      <WaskiServiceConfigurator />
+
       <section id="service-details" className="border-y border-white/10 bg-white/[0.025]">
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
           <SectionTitle eyebrow="Service pages" title="Explore the core offers" />
@@ -154,6 +157,8 @@ export default function WaskiZonePage() {
           </div>
         </div>
       </section>
+
+      <WaskiTrustSection />
 
       <section id="cybersecurity" className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.82fr_1.18fr] lg:px-8">
         <div>
@@ -185,12 +190,16 @@ export default function WaskiZonePage() {
         <div className="grid gap-3 sm:grid-cols-2">{deliverables.map((item) => <div key={item} className="flex items-center gap-3 border border-white/10 bg-panel/70 p-4 text-sm text-white/68"><BadgeCheck size={16} className="shrink-0 text-mint" />{item}</div>)}</div>
       </section>
 
+      <WaskiHowWeWork />
+
       <section className="border-y border-white/10 bg-ink/72">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.86fr_1.14fr] lg:px-8">
           <div><SectionTitle eyebrow="Delivery process" title="How work moves from request to launch" /><p className="mt-5 text-sm leading-7 text-white/62">The process keeps expectations clear before code or security review starts.</p></div>
           <div className="space-y-3">{waskiOnboarding.map((step, index) => <div key={step} className="flex gap-4 border border-white/10 bg-panel/70 p-4"><span className="flex size-9 shrink-0 items-center justify-center border border-mint/30 bg-mint/10 font-mono text-xs text-mint">{index + 1}</span><p className="text-sm leading-6 text-white/66">{step}</p></div>)}</div>
         </div>
       </section>
+
+      <WaskiCaseStudyProof />
 
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-2 lg:px-8">
         <div><SectionTitle eyebrow="Proposal contents" title="What a serious scope should include" /><div className="mt-8 space-y-3">{waskiProposalPreview.map((item) => <p key={item} className="flex gap-3 border border-white/10 bg-panel/70 p-4 text-sm text-white/68"><BadgeCheck size={16} className="mt-0.5 shrink-0 text-mint" />{item}</p>)}</div></div>
@@ -203,6 +212,8 @@ export default function WaskiZonePage() {
           <div className="grid gap-3">{waskiFaqs.map((item) => <details key={item.q} className="border border-white/10 bg-panel/70 p-4"><summary className="cursor-pointer font-bold text-white">{item.q}</summary><p className="mt-3 text-sm leading-7 text-white/62">{item.a}</p></details>)}</div>
         </div>
       </section>
+
+      <WaskiProposalFlow />
 
       <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-[0.75fr_1.25fr]">

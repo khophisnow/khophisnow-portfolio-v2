@@ -11,7 +11,7 @@ const loaders = [
 ] as const;
 
 export function WaskiZoneIntro() {
-  const [loader, setLoader] = useState<(typeof loaders)[number] | null>(null);
+  const [loader, setLoader] = useState<(typeof loaders)[number]>(loaders[0]);
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
@@ -27,7 +27,7 @@ export function WaskiZoneIntro() {
     };
   }, []);
 
-  if (!visible || !loader) return null;
+  if (!visible) return null;
 
   return (
     <div className="fixed inset-0 z-[100] overflow-hidden bg-ink text-white">
