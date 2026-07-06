@@ -256,6 +256,41 @@ export const writeupPosts = [
   { slug: "kiop-samba-lesson", title: "Kiop Samba lesson", type: "CTF practice", readingTime: "3 min read", tags: ["legacy services", "Samba", "patching"], body: ["A short note on legacy Samba exposure, service review, and why old internet-facing services are never small risks."] },
 ];
 
+export const securityNotes = [
+  {
+    title: "Tenant data exposure",
+    rating: "High",
+    area: "Access control",
+    risk: "A multi-school platform can expose records across schools if every route and query does not carry tenant context.",
+    evidence: "Review routes that return shared records, role-protected dashboards, reports, and admin endpoints.",
+    remediation: "Enforce tenant-scoped queries, role guards, permission tests, and regression checks around school boundaries.",
+  },
+  {
+    title: "Weak session lifecycle",
+    rating: "Medium",
+    area: "Authentication",
+    risk: "Long-lived or poorly rotated tokens make account abuse harder to contain after compromise.",
+    evidence: "Review login, refresh, logout, token storage, expiry, and invalidation behavior.",
+    remediation: "Use short-lived access tokens, refresh-token rotation, logout invalidation, and clear session handling notes.",
+  },
+  {
+    title: "Public API overexposure",
+    rating: "Medium",
+    area: "API boundary",
+    risk: "Public endpoints without validation, rate limits, CORS control, and request tracing become harder to defend.",
+    evidence: "Review unauthenticated routes, upload paths, error responses, request volume, and API documentation.",
+    remediation: "Apply request validation, rate limiting, CORS policy, safer errors, OpenAPI docs, and health checks.",
+  },
+  {
+    title: "Moderation gap",
+    rating: "Medium",
+    area: "Community safety",
+    risk: "Community platforms can become unsafe when content review and admin action paths are missing.",
+    evidence: "Review event creation, media uploads, comments, reports, admin actions, and notification flows.",
+    remediation: "Add moderation states, admin review screens, audit notes, and clear content handling workflows.",
+  },
+] as const;
+
 export const projectEvidence = [
   { project: "EduManage", label: "Access boundaries", detail: "Role guards, resolved permissions, and school-aware service queries keep workflows scoped to the right tenant." },
   { project: "EduManage", label: "Integration proof", detail: "Swagger contracts, seed data, health checks, and tests make frontend/backend integration easier to verify." },
@@ -380,3 +415,17 @@ export const waskiBrandGuidelines = {
   voice: ["practical", "technical", "trustworthy", "direct", "security-aware"],
   usage: ["Use WaskiZone for client-facing software and cybersecurity services", "Use W4sk1Z0n3 for the cybersecurity identity and lab-facing materials", "Use transparent logo assets inside the website UI", "Keep claims scoped, authorized, and evidence-based"],
 };
+
+export const waskiTestimonials = [
+  { label: "EduManage proof", quote: "A complex academic platform shows the backend depth behind WaskiZone: modules, roles, tenant boundaries, and API documentation.", source: "Portfolio case study" },
+  { label: "WhatsUpUCC proof", quote: "A campus platform shows practical delivery: public features, moderation, media workflows, and documented backend routes.", source: "Portfolio case study" },
+  { label: "Training proof", quote: "CAS-7 Technology and Amalitech Coding Club work show the teaching side: practical sessions, beginner support, and project-based learning.", source: "Community proof" },
+] as const;
+
+export const waskiSecurityPolicy = [
+  { title: "Authorization first", detail: "Security review only happens on systems the client owns or has written permission to test." },
+  { title: "Clear scope", detail: "Before review starts, the target, boundaries, allowed methods, reporting format, and stop conditions should be agreed." },
+  { title: "No destructive testing", detail: "The focus is review, hardening, and defensive recommendations, not disruption or unsafe exploitation." },
+  { title: "Evidence-based reporting", detail: "Findings should explain risk, affected area, practical evidence, recommended fix, and priority." },
+  { title: "Confidential handling", detail: "Client system details, findings, credentials, and screenshots should be handled privately unless publication is approved." },
+] as const;

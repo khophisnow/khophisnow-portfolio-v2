@@ -19,6 +19,7 @@ import {
 import { waskiBeforeAfter, waskiFaqs, waskiOnboarding, waskiPackages, waskiProposalPreview, waskiServiceDetails, waskiServices, waskiZone } from "@/lib/portfolio-data";
 import { WaskiZoneIntro } from "@/components/WaskiZoneIntro";
 import { WaskiCaseStudyProof, WaskiHowWeWork, WaskiProposalFlow, WaskiServiceConfigurator, WaskiTrustSection } from "@/components/PortfolioPhase";
+import { AuthorizedSecurityPolicyBlock, WaskiPackageComparison, WaskiProofPlaceholders, WaskiQuoteEstimator } from "@/components/WaskiZoneBusiness";
 
 const serviceIcons = [Code2, Layers3, Database, Wrench, ShieldCheck, GraduationCap];
 
@@ -98,8 +99,9 @@ export default function WaskiZonePage() {
           <p className="mt-5 max-w-2xl text-xl font-black leading-tight text-white/88 sm:text-2xl md:text-4xl">{waskiZone.tagline}</p>
           <p className="mt-6 max-w-2xl text-sm leading-7 text-white/68">{waskiZone.positioning}</p>
           <div className="mt-8 flex flex-wrap gap-3">
-            <a href="mailto:juliusmcbrahamsomuah@gmail.com?subject=WaskiZone%20project%20inquiry" className="inline-flex items-center gap-2 bg-mint px-5 py-3 font-bold text-ink hover:bg-white">Start a project<ArrowUpRight size={18} /></a>
+            <Link href="/waskizone/contact" className="inline-flex items-center gap-2 bg-mint px-5 py-3 font-bold text-ink hover:bg-white">Start a project<ArrowUpRight size={18} /></Link>
             <a href="#services" className="inline-flex items-center gap-2 border border-white/18 px-5 py-3 font-bold text-white hover:border-cyan hover:text-cyan">View services</a>
+            <Link href="/waskizone/policy" className="inline-flex items-center gap-2 border border-white/18 px-5 py-3 font-bold text-white hover:border-mint hover:text-mint">Security policy</Link>
           </div>
           <div className="mt-10 grid max-w-2xl gap-3 sm:grid-cols-2">
             {serviceSummary.map((item) => <Signal key={item.label} label={item.label} value={item.value} detail={item.detail} />)}
@@ -148,6 +150,8 @@ export default function WaskiZonePage() {
       </section>
 
       <WaskiServiceConfigurator />
+      <WaskiPackageComparison />
+      <WaskiQuoteEstimator />
 
       <section id="service-details" className="border-y border-white/10 bg-white/[0.025]">
         <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
@@ -159,6 +163,7 @@ export default function WaskiZonePage() {
       </section>
 
       <WaskiTrustSection />
+      <AuthorizedSecurityPolicyBlock />
 
       <section id="cybersecurity" className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.82fr_1.18fr] lg:px-8">
         <div>
@@ -200,6 +205,7 @@ export default function WaskiZonePage() {
       </section>
 
       <WaskiCaseStudyProof />
+      <WaskiProofPlaceholders />
 
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-2 lg:px-8">
         <div><SectionTitle eyebrow="Proposal contents" title="What a serious scope should include" /><div className="mt-8 space-y-3">{waskiProposalPreview.map((item) => <p key={item} className="flex gap-3 border border-white/10 bg-panel/70 p-4 text-sm text-white/68"><BadgeCheck size={16} className="mt-0.5 shrink-0 text-mint" />{item}</p>)}</div></div>
@@ -218,7 +224,7 @@ export default function WaskiZonePage() {
       <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="grid gap-5 lg:grid-cols-[0.75fr_1.25fr]">
           <div className="border border-mint/25 bg-mint/10 p-6"><Rocket className="text-mint" /><h2 className="mt-5 text-3xl font-black text-white">Ready to discuss a project?</h2><p className="mt-5 text-sm leading-7 text-white/70">Send the goal, current state, timeline, and whether you need software build work, security support, training, or maintenance.</p></div>
-          <div id="contact-flow" className="border border-white/10 bg-panel/75 p-8"><SectionTitle eyebrow="Contact" title="Choose the service intent" /><div className="mt-8 flex flex-wrap gap-3">{["Backend API", "Full-stack app", "Dashboard", "Cybersecurity review", "Training", "Maintenance"].map((intent) => <a key={intent} href={`mailto:juliusmcbrahamsomuah@gmail.com?subject=WaskiZone%20${encodeURIComponent(intent)}%20inquiry`} className="border border-white/12 px-4 py-3 text-sm font-bold text-white/70 hover:border-mint hover:text-mint">{intent}<Send className="ml-2 inline" size={14} /></a>)}</div></div>
+          <div id="contact-flow" className="border border-white/10 bg-panel/75 p-8"><SectionTitle eyebrow="Contact" title="Choose the service intent" /><Link href="/waskizone/contact" className="mt-5 inline-flex items-center gap-2 border border-mint/30 px-4 py-3 font-bold text-mint hover:bg-mint hover:text-ink">Open full proposal intake<ArrowUpRight size={16} /></Link><div className="mt-8 flex flex-wrap gap-3">{["Backend API", "Full-stack app", "Dashboard", "Cybersecurity review", "Training", "Maintenance"].map((intent) => <a key={intent} href={`mailto:juliusmcbrahamsomuah@gmail.com?subject=WaskiZone%20${encodeURIComponent(intent)}%20inquiry`} className="border border-white/12 px-4 py-3 text-sm font-bold text-white/70 hover:border-mint hover:text-mint">{intent}<Send className="ml-2 inline" size={14} /></a>)}</div></div>
         </div>
       </section>
     </main>
