@@ -39,7 +39,7 @@ export function LoadingAtmosphere({ eyebrow, title, autoDismiss = false, showSki
 
   const videoClassName = useMemo(() => {
     const base = "absolute inset-0 h-full w-full object-center opacity-70 mix-blend-screen saturate-150 contrast-125";
-    if (scene.fit === "contain") return `${base} object-contain p-7 sm:p-0 sm:scale-[1.04] sm:object-cover`;
+    if (scene.fit === "contain") return `${base} object-cover scale-[0.9] sm:scale-[1.04]`;
     return `${base} scale-[1.04] object-cover`;
   }, [scene.fit]);
 

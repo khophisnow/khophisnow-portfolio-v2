@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { ArrowLeft, BadgeCheck, ShieldAlert } from "lucide-react";
+import { BadgeCheck, ShieldAlert } from "lucide-react";
+import { SourceBackLink } from "@/components/SourceBackLink";
 import { securityNotes } from "@/lib/portfolio-data";
 
 export const metadata = {
@@ -11,11 +11,11 @@ export default function SecurityNotesPage() {
   return (
     <main className="scanline min-h-screen bg-ink text-white">
       <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <Link href="/#lab" className="inline-flex items-center gap-2 text-sm font-bold text-mint hover:text-white"><ArrowLeft size={16} />Back to lab</Link>
+        <SourceBackLink fallback={{ href: "/", label: "Back home" }} sources={{ home: { href: "/#lab", label: "Back to lab" } }} />
         <div className="mt-12 grid gap-8 lg:grid-cols-[0.38fr_0.62fr]">
           <div>
             <p className="font-mono text-sm uppercase text-mint">Security notes</p>
-            <h1 className="mt-3 text-5xl font-black leading-tight md:text-7xl">Risk notes with practical remediation.</h1>
+            <h1 className="mt-3 text-4xl font-black leading-tight md:text-6xl">Risk notes with practical remediation.</h1>
             <p className="mt-6 max-w-xl text-sm leading-7 text-white/62">A sample of how I explain findings: what can go wrong, where to look, why it matters, and what action reduces risk.</p>
           </div>
           <div className="grid gap-4">

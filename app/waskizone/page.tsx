@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import {
-  ArrowLeft,
   ArrowUpRight,
   BadgeCheck,
   BriefcaseBusiness,
@@ -20,6 +19,7 @@ import { waskiBeforeAfter, waskiFaqs, waskiOnboarding, waskiPackages, waskiPropo
 import { WaskiZoneIntro } from "@/components/WaskiZoneIntro";
 import { WaskiCaseStudyProof, WaskiHowWeWork, WaskiProposalFlow, WaskiServiceConfigurator, WaskiTrustSection } from "@/components/PortfolioPhase";
 import { AuthorizedSecurityPolicyBlock, WaskiPackageComparison, WaskiProofPlaceholders, WaskiQuoteEstimator } from "@/components/WaskiZoneBusiness";
+import { SourceBackLink } from "@/components/SourceBackLink";
 
 const serviceIcons = [Code2, Layers3, Database, Wrench, ShieldCheck, GraduationCap];
 
@@ -87,7 +87,7 @@ export default function WaskiZonePage() {
       <div className="cyber-grid pointer-events-none absolute inset-x-0 top-0 h-[760px]" />
       <header className="relative z-10 border-b border-white/10 bg-ink/88 backdrop-blur-xl">
         <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-4 lg:px-8">
-          <Link href="/#waskizone" className="inline-flex items-center gap-2 text-sm font-bold text-mint hover:text-white"><ArrowLeft size={16} />Back to portfolio</Link>
+          <SourceBackLink fallback={{ href: "/", label: "Portfolio home" }} sources={{ home: { href: "/#waskizone", label: "Back to portfolio" } }} />
           <a href="mailto:juliusmcbrahamsomuah@gmail.com?subject=WaskiZone%20service%20inquiry" className="inline-flex items-center gap-2 border border-mint/40 px-4 py-2 text-sm font-bold text-mint hover:bg-mint hover:text-ink">Request service<ArrowUpRight size={15} /></a>
         </nav>
       </header>
@@ -95,7 +95,7 @@ export default function WaskiZonePage() {
       <section className="relative z-10 mx-auto grid max-w-7xl gap-10 px-5 py-14 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:px-8 lg:py-24">
         <div>
           <p className="font-mono text-sm uppercase text-mint">Software development / cybersecurity support</p>
-          <h1 className="mt-4 text-4xl font-black leading-tight sm:text-5xl md:text-7xl">{waskiZone.name}</h1>
+          <h1 className="mt-4 text-4xl font-black leading-tight sm:text-5xl md:text-6xl">{waskiZone.name}</h1>
           <p className="mt-5 max-w-2xl text-xl font-black leading-tight text-white/88 sm:text-2xl md:text-4xl">{waskiZone.tagline}</p>
           <p className="mt-6 max-w-2xl text-sm leading-7 text-white/68">{waskiZone.positioning}</p>
           <div className="mt-8 flex flex-wrap gap-3">

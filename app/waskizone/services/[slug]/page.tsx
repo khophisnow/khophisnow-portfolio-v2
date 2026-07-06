@@ -44,7 +44,7 @@ export default async function WaskiServicePage({ params }: { params: Params }) {
       <section className="mx-auto max-w-5xl px-5 py-12 lg:px-8">
         <SourceBackLink fallback={{ href: "/waskizone#service-details", label: "Back to service pages" }} sources={{ configure: { href: "/waskizone#configure", label: "Back to service configurator" } }} />
         <p className="mt-12 font-mono text-sm uppercase text-cyan">WaskiZone service</p>
-        <h1 className="mt-4 text-5xl font-black leading-tight md:text-7xl">{service.title}</h1>
+        <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">{service.title}</h1>
         <p className="mt-6 max-w-3xl text-lg leading-8 text-white/68">{service.summary}</p>
         <div className="mt-10 grid gap-5 md:grid-cols-2">
           <article className="border border-white/10 bg-panel/70 p-6">

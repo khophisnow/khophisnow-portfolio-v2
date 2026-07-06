@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { ArrowLeft, LockKeyhole, ShieldCheck } from "lucide-react";
+import { LockKeyhole, ShieldCheck } from "lucide-react";
+import { SourceBackLink } from "@/components/SourceBackLink";
 import { waskiSecurityPolicy } from "@/lib/portfolio-data";
 
 export const metadata = {
@@ -11,11 +11,11 @@ export default function WaskiZonePolicyPage() {
   return (
     <main className="scanline min-h-screen bg-ink text-white">
       <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
-        <Link href="/waskizone#cybersecurity" className="inline-flex items-center gap-2 text-sm font-bold text-mint hover:text-white"><ArrowLeft size={16} />Back to WaskiZone</Link>
+        <SourceBackLink fallback={{ href: "/waskizone", label: "Back to WaskiZone" }} sources={{ cybersecurity: { href: "/waskizone#cybersecurity", label: "Back to security services" } }} />
         <div className="mt-12 grid gap-10 lg:grid-cols-[0.4fr_0.6fr]">
           <div>
             <p className="font-mono text-sm uppercase text-mint">Authorized security only</p>
-            <h1 className="mt-3 text-5xl font-black leading-tight md:text-7xl">Clear scope before any security work.</h1>
+            <h1 className="mt-3 text-4xl font-black leading-tight md:text-6xl">Clear scope before any security work.</h1>
             <p className="mt-6 max-w-xl text-sm leading-7 text-white/62">Cybersecurity support is professional only when permission, scope, reporting, and safety limits are agreed before work begins.</p>
           </div>
           <div className="grid gap-4">

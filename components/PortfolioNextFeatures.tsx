@@ -87,7 +87,7 @@ export function SecurityNotesPreview() {
         <div>
           <SectionTitle eyebrow="Security notes" title="Sample findings, risk ratings, and remediation style" />
           <p className="mt-5 text-sm leading-7 text-white/62">This is the tone I want security work to have: clear risk, practical evidence, and fixes that a product owner can understand.</p>
-          <Link href="/security-notes" className="mt-7 inline-flex items-center gap-2 bg-mint px-4 py-3 font-bold text-ink hover:bg-white">Open notes<ArrowUpRight size={16} /></Link>
+          <Link href="/security-notes?from=home" className="mt-7 inline-flex items-center gap-2 bg-mint px-4 py-3 font-bold text-ink hover:bg-white">Open notes<ArrowUpRight size={16} /></Link>
         </div>
         <div className="grid gap-4">
           {highest.map((note) => (

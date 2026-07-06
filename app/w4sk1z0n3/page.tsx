@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { ArrowLeft, Binary, LockKeyhole, Radar, Terminal } from "lucide-react";
+import { Binary, LockKeyhole, Radar, Terminal } from "lucide-react";
+import { SourceBackLink } from "@/components/SourceBackLink";
 import { labItems, writeupPosts } from "@/lib/portfolio-data";
 
 export const metadata = { title: "W4sk1Z0n3 | Cybersecurity Services", icons: { icon: "/brand/waskizone/favicon/favicon.ico" } };
@@ -17,11 +17,11 @@ export default function W4sk1Z0n3Page() {
   return (
     <main className="scanline min-h-screen bg-ink text-white">
       <section className="mx-auto max-w-7xl px-5 py-12 lg:px-8">
-        <Link href="/waskizone#cybersecurity" className="inline-flex items-center gap-2 text-sm font-bold text-mint hover:text-white"><ArrowLeft size={16} />Back to WaskiZone</Link>
+        <SourceBackLink fallback={{ href: "/waskizone", label: "Back to WaskiZone" }} sources={{ cybersecurity: { href: "/waskizone#cybersecurity", label: "Back to security services" } }} />
         <div className="mt-12 grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
             <p className="font-mono text-sm uppercase text-red-300">Cybersecurity service identity</p>
-            <h1 className="mt-4 text-5xl font-black leading-tight md:text-7xl">W4sk1Z0n3</h1>
+            <h1 className="mt-4 text-4xl font-black leading-tight md:text-6xl">W4sk1Z0n3</h1>
             <p className="mt-6 text-sm leading-7 text-white/68">W4sk1Z0n3 is the cybersecurity lane under WaskiZone, focused on authorized review, practical hardening, defensive education, and security-aware software decisions.</p>
           </div>
           <div className="border border-red-500/25 bg-red-500/10 p-6">
