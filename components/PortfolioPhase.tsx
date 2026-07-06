@@ -38,12 +38,14 @@ export function ProjectWalkthroughs() {
             <p className="mt-4 text-sm leading-7 text-white/64">{project.brief}</p>
             <div className="mt-5 flex flex-wrap gap-2">{project.impact.map((item) => <span key={item} className="border border-mint/25 bg-mint/10 px-3 py-2 font-mono text-xs text-mint">{item}</span>)}</div>
           </article>
-          <div className="grid gap-3 md:grid-cols-5">
+          <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-5">
             {flow.map((step, index) => (
-              <article key={step} className="min-h-[190px] border border-white/10 bg-panel/70 p-4">
-                <span className="flex size-9 items-center justify-center border border-mint/30 bg-mint/10 font-mono text-xs text-mint">{index + 1}</span>
-                <h4 className="mt-4 text-lg font-black text-white">{step}</h4>
-                <p className="mt-3 text-xs leading-6 text-white/58">{details[index]}</p>
+              <article key={step} className="grid min-w-0 gap-4 border border-white/10 bg-panel/70 p-4 sm:grid-cols-[2.5rem_1fr] xl:block xl:min-h-[170px]">
+                <span className="flex size-10 shrink-0 items-center justify-center border border-mint/30 bg-mint/10 font-mono text-xs text-mint">{index + 1}</span>
+                <div className="min-w-0">
+                  <h4 className="text-base font-black text-white xl:mt-4 xl:text-lg">{step}</h4>
+                  <p className="mt-2 text-xs leading-6 text-white/58 xl:mt-3">{details[index]}</p>
+                </div>
               </article>
             ))}
           </div>

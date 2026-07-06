@@ -1,24 +1,23 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import { Suspense } from "react";
 import { ArrowLeft } from "lucide-react";
 
 type SourceTarget = { href: string; label: string };
 
 function BackLink({ target, useHistory = true }: { target: SourceTarget; useHistory?: boolean }) {
-  const router = useRouter();
   const pathname = usePathname();
 
   const handleClick = (event: React.MouseEvent<HTMLAnchorElement>) => {
     if (!useHistory || typeof window === "undefined") return;
 
     const previous = window.sessionStorage.getItem("khophi:previousPath");
-    if (!previous || previous === pathname || previous.startsWith(`${pathname}?`)) return;
+    if (!previous || previous === pathname || previous.startsWith(`${pathname}?`) || window.history.length <= 1) return;
 
     event.preventDefault();
-    router.push(previous);
+    window.history.back();
   };
 
   return (
@@ -32,7 +31,7 @@ function BackLink({ target, useHistory = true }: { target: SourceTarget; useHist
 function SourceBackLinkInner({ fallback, sources }: { fallback: SourceTarget; sources: Record<string, SourceTarget> }) {
   const source = useSearchParams().get("from") || "";
   const target = sources[source] ?? fallback;
-  return <BackLink target={target} useHistory={!source} />;
+  return <BackLink target={target} />;
 }
 
 export function SourceBackLink({ fallback, sources }: { fallback: SourceTarget; sources: Record<string, SourceTarget> }) {
