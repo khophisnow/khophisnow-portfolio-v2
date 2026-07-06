@@ -9,6 +9,7 @@ export function WaskiZoneIntro() {
       title="Practical software. Security-minded systems."
       autoDismiss
       showSkip
+      duration={3200}
     />
   );
 }

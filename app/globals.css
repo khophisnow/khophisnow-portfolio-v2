@@ -21,6 +21,7 @@ html {
 body {
   min-height: 100vh;
   margin: 0;
+  zoom: 0.8;
   background:
     radial-gradient(circle at 14% 8%, rgba(24, 84, 165, 0.22), transparent 25rem),
     radial-gradient(circle at 82% 18%, rgba(173, 52, 35, 0.14), transparent 24rem),
@@ -460,3 +461,4 @@ pre,
 code {
   max-width: 100%;
 }
+

@@ -31,23 +31,29 @@ export function ProjectWalkthroughs() {
             ))}
           </div>
         </div>
-        <div className="mt-10 grid gap-6 lg:grid-cols-[0.38fr_0.62fr]">
-          <article className="border border-white/10 bg-panel/70 p-5">
-            <p className="font-mono text-xs uppercase text-cyan">{project.code} / {project.status}</p>
-            <h3 className="mt-3 text-3xl font-black text-white">{project.name}</h3>
-            <p className="mt-4 text-sm leading-7 text-white/64">{project.brief}</p>
-            <div className="mt-5 flex flex-wrap gap-2">{project.impact.map((item) => <span key={item} className="border border-mint/25 bg-mint/10 px-3 py-2 font-mono text-xs text-mint">{item}</span>)}</div>
+        <div className="mt-10 grid gap-6 xl:grid-cols-[minmax(0,0.34fr)_minmax(0,0.66fr)]">
+          <article className="flex min-w-0 flex-col justify-between border border-white/10 bg-panel/70 p-6">
+            <div>
+              <p className="font-mono text-xs uppercase text-cyan">{project.code} / {project.status}</p>
+              <h3 className="mt-3 text-3xl font-black text-white">{project.name}</h3>
+              <p className="mt-4 text-sm leading-7 text-white/64">{project.brief}</p>
+            </div>
+            <div className="mt-6 grid gap-2 sm:grid-cols-2 xl:grid-cols-1">{project.impact.map((item) => <span key={item} className="border border-mint/25 bg-mint/10 px-3 py-2 font-mono text-xs text-mint">{item}</span>)}</div>
           </article>
-          <div className="grid min-w-0 gap-4 sm:grid-cols-2 xl:grid-cols-5">
-            {flow.map((step, index) => (
-              <article key={step} className="grid min-w-0 gap-4 border border-white/10 bg-panel/70 p-4 sm:grid-cols-[2.5rem_1fr] xl:block xl:min-h-[170px]">
-                <span className="flex size-10 shrink-0 items-center justify-center border border-mint/30 bg-mint/10 font-mono text-xs text-mint">{index + 1}</span>
-                <div className="min-w-0">
-                  <h4 className="text-base font-black text-white xl:mt-4 xl:text-lg">{step}</h4>
-                  <p className="mt-2 text-xs leading-6 text-white/58 xl:mt-3">{details[index]}</p>
-                </div>
-              </article>
-            ))}
+          <div className="relative min-w-0 border border-white/10 bg-panel/70 p-4 sm:p-5">
+            <div className="pointer-events-none absolute left-8 top-10 hidden h-[calc(100%-5rem)] w-px bg-gradient-to-b from-mint/70 via-cyan/35 to-transparent lg:block" />
+            <div className="grid gap-4 lg:grid-cols-2">
+              {flow.map((step, index) => (
+                <article key={step} className={`relative grid min-w-0 gap-4 border border-white/10 bg-black/24 p-4 sm:grid-cols-[2.75rem_1fr] ${index === flow.length - 1 ? "lg:col-span-2" : ""}`}>
+                  <span className="relative z-10 flex size-11 shrink-0 items-center justify-center border border-mint/30 bg-ink font-mono text-xs text-mint shadow-terminal">{index + 1}</span>
+                  <div className="min-w-0">
+                    <p className="font-mono text-[10px] uppercase text-cyan">step {String(index + 1).padStart(2, "0")}</p>
+                    <h4 className="mt-1 text-lg font-black text-white">{step}</h4>
+                    <p className="mt-2 text-xs leading-6 text-white/58">{details[index]}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
         </div>
       </div>
@@ -152,20 +158,33 @@ export function ScrollDrivenSystemLayers() {
 
   return (
     <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
-      <div className="grid gap-10 lg:grid-cols-[minmax(0,0.36fr)_minmax(0,0.64fr)]">
-        <div className="lg:sticky lg:top-28 lg:self-start">
-          <SectionTitle eyebrow="System layers" title="Scroll through the layers behind the work" />
-          <p className="mt-5 text-sm leading-7 text-white/62">The site should not only say backend and security. It should show the layers I think through when building or reviewing a system.</p>
+      <div className="grid gap-8 lg:grid-cols-[minmax(0,0.62fr)_minmax(0,0.38fr)] lg:items-end">
+        <div>
+          <SectionTitle eyebrow="System layers" title="The layers behind the work" />
+          <p className="mt-5 max-w-3xl text-sm leading-7 text-white/62">A useful system is not one screen or one API. It is the path from interface decisions to security review, with each layer making the next one safer and clearer.</p>
         </div>
-        <div className="space-y-4">
+        <div className="border border-mint/20 bg-mint/10 p-5">
+          <p className="font-mono text-xs uppercase text-mint">Delivery pattern</p>
+          <p className="mt-3 text-xl font-black leading-tight text-white md:text-2xl">Interface &rarr; API &rarr; identity &rarr; data &rarr; review</p>
+          <p className="mt-3 text-sm leading-7 text-white/60">The checklist I use when building, debugging, or reviewing backend-heavy products.</p>
+        </div>
+      </div>
+      <div className="relative mt-12">
+        <div className="absolute left-0 right-0 top-16 hidden h-px bg-gradient-to-r from-mint/10 via-cyan/45 to-mint/10 lg:block" />
+        <div className="grid min-w-0 gap-4 md:grid-cols-2 xl:grid-cols-5">
           {layers.map((layer, index) => { const Icon = layer.icon; return (
-            <article key={layer.label} className="layer-reveal grid min-w-0 gap-4 border border-white/10 bg-panel/70 p-5 sm:grid-cols-[3rem_1fr]">
-              <span className="flex size-12 items-center justify-center border border-mint/25 bg-mint/10 text-mint"><Icon size={19} /></span>
-              <span className="min-w-0">
-                <span className="font-mono text-xs uppercase text-cyan">Layer {index + 1}</span>
-                <h3 className="mt-2 text-2xl font-black text-white">{layer.label}</h3>
-                <p className="mt-3 break-words text-sm leading-7 text-white/62">{layer.detail}</p>
-              </span>
+            <article key={layer.label} className="layer-reveal relative flex min-h-[18rem] min-w-0 flex-col border border-white/10 bg-panel/76 p-5 shadow-terminal">
+              <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-mint/55 to-transparent" />
+              <div className="flex items-start justify-between gap-4">
+                <span className="relative z-10 flex size-12 shrink-0 items-center justify-center border border-mint/25 bg-ink text-mint"><Icon size={19} /></span>
+                <span className="font-mono text-xs uppercase text-cyan">Layer {String(index + 1).padStart(2, "0")}</span>
+              </div>
+              <h3 className="mt-6 text-2xl font-black text-white">{layer.label}</h3>
+              <p className="mt-3 flex-1 text-sm leading-7 text-white/62">{layer.detail}</p>
+              <div className="mt-6 flex items-center gap-3">
+                <span className="h-px flex-1 bg-white/12" />
+                <span className="font-mono text-[10px] uppercase text-white/45">{index === layers.length - 1 ? "review" : "next"}</span>
+              </div>
             </article>
           ); })}
         </div>

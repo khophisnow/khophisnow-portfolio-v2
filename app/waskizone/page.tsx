@@ -185,9 +185,11 @@ export default function WaskiZonePage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-2 lg:px-8">
-        <div><SectionTitle eyebrow="Fit" title="Who WaskiZone is built for" /><div className="mt-8 grid gap-4 sm:grid-cols-2">{clientFits.map((fit) => <article key={fit.label} className="border border-white/10 bg-panel/70 p-5"><BriefcaseBusiness className="text-cyan" size={18} /><h3 className="mt-4 text-xl font-black text-white">{fit.label}</h3><p className="mt-3 text-sm leading-7 text-white/62">{fit.detail}</p></article>)}</div></div>
-        <div><SectionTitle eyebrow="Proof" title="Why the offer is credible" /><div className="mt-8 grid gap-4">{proofPoints.map((item) => <article key={item.label} className="border border-white/10 bg-panel/70 p-5"><p className="font-mono text-xs uppercase text-mint">{item.label}</p><p className="mt-3 text-sm leading-7 text-white/68">{item.value}</p></article>)}</div></div>
+      <section className="mx-auto max-w-7xl px-5 py-16 lg:px-8">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,0.54fr)_minmax(0,0.46fr)] lg:items-start">
+          <div className="min-w-0"><SectionTitle eyebrow="Fit" title="Who WaskiZone is built for" /><div className="mt-8 grid gap-4 sm:grid-cols-2">{clientFits.map((fit) => <article key={fit.label} className="flex h-full flex-col border border-white/10 bg-panel/70 p-5"><BriefcaseBusiness className="text-cyan" size={18} /><h3 className="mt-4 text-xl font-black text-white">{fit.label}</h3><p className="mt-3 text-sm leading-7 text-white/62">{fit.detail}</p></article>)}</div></div>
+          <div className="min-w-0"><SectionTitle eyebrow="Proof" title="Why the offer is credible" /><div className="mt-8 grid gap-4">{proofPoints.map((item) => <article key={item.label} className="border border-white/10 bg-panel/70 p-5"><p className="font-mono text-xs uppercase text-mint">{item.label}</p><p className="mt-3 text-sm leading-7 text-white/68">{item.value}</p></article>)}</div></div>
+        </div>
       </section>
 
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-[minmax(0,0.86fr)_minmax(0,1.14fr)] lg:px-8">
