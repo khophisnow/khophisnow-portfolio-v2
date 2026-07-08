@@ -1,0 +1,88 @@
+# Elite Website Audit Scorecard
+
+This scorecard tracks the production-readiness review for the KhophiSnow portfolio and WaskiZone site. The audit document is intentionally broad, so this file separates completed work from remaining work that still deserves focused design, QA, or product passes.
+
+## Current Production Readiness
+
+| Area | Score | Status | Notes |
+| --- | ---: | --- | --- |
+| Architecture | 8 | Strong | Next.js app routing, shared content data, dynamic routes, and reusable sections are in place. A future CMS/admin layer is intentionally deferred. |
+| UI | 8 | Strong | Visual identity is distinct and branded. Remaining polish is mostly fine spacing, motion restraint, and mobile section-by-section tuning. |
+| UX | 8 | Strong | The site has clear portfolio, service, writeup, case-study, and contact paths. Browser-like back behavior and service flows were improved earlier. |
+| Accessibility | 7 | Good | Focus styles, skip link, semantic metadata, labels, and reduced-motion handling exist. A screen-reader and keyboard pass is still needed. |
+| SEO | 8 | Strong | Metadata, canonical URLs, Open Graph, sitemap, robots, and structured data are implemented. Future work: richer page-specific copy and image metadata. |
+| Security | 8 | Strong | Security headers, contact validation, rate limiting, environment fallback behavior, and safer API handling are implemented. Future work: dependency/security scanning automation. |
+| Performance | 7 | Good | Loader behavior, asset checks, and unused large public assets were cleaned up. Future work: video compression, font strategy, and Lighthouse-based thresholds. |
+| Code Quality | 8 | Strong | Lint/build pass and audit scripts are available. Future work: component-level tests and reducing very large component files. |
+| Maintainability | 8 | Strong | Shared data modules and audit scripts help keep changes organized. Future work: split long page sections into smaller feature modules. |
+| Scalability | 7 | Good | Static-first public site is reliable. Content management is still manual until a CMS/admin phase is introduced. |
+| Mobile Experience | 7 | Good | Main mobile layout has been polished repeatedly. Needs a dedicated device-by-device QA checklist with screenshots. |
+| Backend/API | 7 | Good | Contact API and GitHub feed API are hardened for the current site size. No database-backed features are active yet. |
+| Frontend | 8 | Strong | App router, dynamic pages, videos, modes, loaders, and service flows are in place. Future work: visual regression checks. |
+| DevOps | 7 | Good | Vercel deploys, scheduled GitHub feed updates, and audit commands exist. Future work: CI workflow that runs the local audit gate. |
+| Testing | 5 | Needs Work | Manual checks and audit scripts exist, but no real unit, integration, or browser automation suite yet. |
+| Product Quality | 8 | Strong | Portfolio and WaskiZone now tell a clearer story. Future work: more proof, testimonials, project media, and tighter conversion copy. |
+
+**Overall score:** 7.5 / 10
+
+## Completed From The Audit Prompt
+
+- Security headers added at the framework level.
+- Contact API validation, sanitization, JSON enforcement, and rate limiting added.
+- Mail fallback behavior preserved for visitor email clients.
+- SEO metadata, canonical URLs, sitemap coverage, robots, Open Graph, and structured data improved.
+- Static audit script added for production-readiness checks.
+- Live audit script added for deployed route and header checks.
+- Asset audit script added for large public assets.
+- Combined local quality gate added with `npm run audit:all`.
+- WaskiZone loader behavior improved to avoid unnecessary video loading.
+- Unused large screenshots removed from `public/images`.
+
+## Remaining High-Value Work
+
+### Critical Before Any Major Marketing Push
+
+| Problem | Why It Matters | Recommended Solution | Effort |
+| --- | --- | --- | --- |
+| No browser automation | Manual checking can miss mobile, navigation, and form regressions. | Add Playwright smoke tests for home, WaskiZone, writeups, case studies, contact, and loaders. | Medium |
+| No Lighthouse budget | Performance can slowly regress with videos and images. | Add Lighthouse/Pagespeed targets or a manual release checklist with asset budgets. | Medium |
+| Large video reliance | Videos create strong identity but can hurt first-load experience. | Compress videos, add mobile-specific variants, and set size budgets. | Medium |
+| No visual regression checks | UI changes can break mobile spacing without failing build. | Add screenshot checkpoints for key routes. | Medium |
+
+### High Priority
+
+| Problem | Why It Matters | Recommended Solution | Effort |
+| --- | --- | --- | --- |
+| Long components | Large files are harder to maintain and review. | Split major sections into smaller feature components. | Medium |
+| Manual content updates | New projects/writeups require code changes. | Revisit CMS/admin later after the public site is stable. | High |
+| Accessibility needs real assistive-tech pass | Static checks do not prove good screen-reader flow. | Test keyboard order, focus traps, alt text, headings, and form announcements. | Medium |
+| Limited proof assets | Visitors trust real work more than claims. | Add more project screenshots, short demos, and future client/testimonial proof. | Medium |
+
+### Medium Priority
+
+| Problem | Why It Matters | Recommended Solution | Effort |
+| --- | --- | --- | --- |
+| Scheduled GitHub feed creates redeploys | It is useful but can be noisy. | Keep twice-daily unless the feed becomes central to the experience. | Low |
+| Contact uses mail/client fallback | It is reliable but not a full CRM. | Later add a proper provider once business inquiries increase. | Medium |
+| No dependency scanning script | Package risks can go unnoticed. | Add `npm audit` review to release checklist or CI. | Low |
+| No analytics event review | Tracking exists, but learning loops are thin. | Define useful events and review them monthly. | Low |
+
+## Final Perfection Checklist
+
+- [x] Production security headers exist.
+- [x] Contact API validates and rate-limits input.
+- [x] Metadata and canonical URLs are present.
+- [x] Sitemap and robots are generated.
+- [x] Static and live audits exist.
+- [x] Large public asset audit exists.
+- [x] Unused heavy screenshots removed.
+- [ ] Add browser automation tests.
+- [ ] Add Lighthouse or performance budget checks.
+- [ ] Compress and/or create mobile versions of loader videos.
+- [ ] Perform keyboard and screen-reader QA.
+- [ ] Add visual regression screenshots for key pages.
+- [ ] Split oversized components into smaller modules.
+- [ ] Add a CI workflow for `npm run audit:all`.
+- [ ] Add dependency/security scanning to release process.
+- [ ] Add more real project media and proof assets.
+- [ ] Revisit CMS/admin only after the static public site is fully stable.

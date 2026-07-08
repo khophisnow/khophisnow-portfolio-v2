@@ -14,6 +14,7 @@ const checks = [
   ["Dynamic case canonical", "app/case-files/[slug]/page.tsx", "alternates: { canonical"],
   ["Dynamic writeup canonical", "app/writeups/[slug]/page.tsx", "alternates: { canonical"],
   ["Dynamic service canonical", "app/waskizone/services/[slug]/page.tsx", "alternates: { canonical"],
+  ["Elite audit scorecard", "docs/elite-audit-scorecard.md", "Overall score"],
 ];
 
 let failed = 0;
