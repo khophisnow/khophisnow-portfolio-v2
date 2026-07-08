@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import { NavigationMemory } from "@/components/NavigationMemory";
@@ -18,8 +18,31 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://khophisnow.vercel.app"),
-  title: "KhophiSnow | Backend API Developer & Ethical Hacking Enthusiast",
+  title: {
+    default: "KhophiSnow | Backend API Developer & Ethical Hacking Enthusiast",
+    template: "%s | KhophiSnow",
+  },
   applicationName: "KhophiSnow Portfolio",
+  category: "technology",
+  creator: "Somuah Julius Mcbraham Paapa-Boateng",
+  publisher: "KhophiSnow / WaskiZone",
+  keywords: [
+    "KhophiSnow",
+    "Somuah Julius Mcbraham Paapa-Boateng",
+    "backend developer Ghana",
+    "NestJS developer",
+    "API developer",
+    "ethical hacking",
+    "WaskiZone",
+    "secure systems",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
   icons: {
     icon: [
       { url: "/favicon.ico", sizes: "any" },
@@ -55,6 +78,38 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#030605",
+};
+
+const structuredData = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://khophisnow.vercel.app/#person",
+      name: "Somuah Julius Mcbraham Paapa-Boateng",
+      alternateName: "KhophiSnow",
+      url: "https://khophisnow.vercel.app",
+      jobTitle: "Backend API Developer",
+      sameAs: ["https://github.com/khophisnow", "https://www.linkedin.com/in/khophisnow"],
+      knowsAbout: ["Backend APIs", "NestJS", "PostgreSQL", "Prisma", "Secure systems", "Ethical hacking"],
+    },
+    {
+      "@type": "ProfessionalService",
+      "@id": "https://khophisnow.vercel.app/waskizone#service",
+      name: "WaskiZone",
+      url: "https://khophisnow.vercel.app/waskizone",
+      founder: { "@id": "https://khophisnow.vercel.app/#person" },
+      areaServed: "Ghana",
+      serviceType: ["Software development", "Backend API engineering", "Dashboard development", "Authorized cybersecurity support"],
+    },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -63,8 +118,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${inter.variable} ${jetbrainsMono.variable}`}>
+        <a href="#main-content" className="skip-link">Skip to main content</a>
         <NavigationMemory />
-        {children}
+        <div id="main-content" tabIndex={-1}>{children}</div>
+        <script type="application/ld+json" suppressHydrationWarning dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
         <Analytics />
       </body>
     </html>

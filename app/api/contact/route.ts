@@ -4,6 +4,9 @@ const contactEmail = process.env.CONTACT_TO_EMAIL || "juliusmcbrahamsomuah@gmail
 const fromEmail = process.env.CONTACT_FROM_EMAIL || "KhophiSnow Portfolio <onboarding@resend.dev>";
 const resendApiKey = process.env.RESEND_API_KEY;
 const formspreeEndpoint = process.env.FORMSPREE_ENDPOINT;
+const rateLimitWindowMs = 10 * 60 * 1000;
+const maxRequestsPerWindow = 5;
+const requestLog = new Map<string, number[]>();
 
 type ContactPayload = {
   name?: string;
@@ -14,23 +17,65 @@ type ContactPayload = {
 
 function fallbackMailto(payload: ContactPayload) {
   const subject = encodeURIComponent(payload.intent || "Portfolio contact");
-  const body = encodeURIComponent(`Name: ${payload.name || ""}\nEmail: ${payload.email || ""}\n\n${payload.message || ""}`);
+  const body = encodeURIComponent(`Name: ${payload.name || ""}
+Email: ${payload.email || ""}
+
+${payload.message || ""}`);
   return `mailto:${contactEmail}?subject=${subject}&body=${body}`;
 }
 
-function cleanText(value: unknown) {
-  return typeof value === "string" ? value.trim().slice(0, 2000) : "";
+function cleanText(value: unknown, limit = 2000) {
+  return typeof value === "string" ? value.replace(/[<>]/g, "").trim().slice(0, limit) : "";
+}
+
+function isValidEmail(value: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) && value.length <= 254;
+}
+
+function getClientKey(request: Request) {
+  const forwardedFor = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim();
+  const realIp = request.headers.get("x-real-ip")?.trim();
+  return forwardedFor || realIp || "unknown";
+}
+
+function isRateLimited(key: string) {
+  const now = Date.now();
+  const recent = (requestLog.get(key) || []).filter((time) => now - time < rateLimitWindowMs);
+  if (recent.length >= maxRequestsPerWindow) {
+    requestLog.set(key, recent);
+    return true;
+  }
+  recent.push(now);
+  requestLog.set(key, recent);
+  return false;
 }
 
 export async function POST(request: Request) {
+  if (isRateLimited(getClientKey(request))) {
+    return NextResponse.json({ ok: false, error: "Too many messages. Please wait a few minutes and try again." }, { status: 429 });
+  }
+
+  const contentType = request.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    return NextResponse.json({ ok: false, error: "Send the contact request as JSON." }, { status: 415 });
+  }
+
   const payload = (await request.json().catch(() => ({}))) as ContactPayload;
-  const name = cleanText(payload.name);
-  const email = cleanText(payload.email);
-  const intent = cleanText(payload.intent) || "Portfolio contact";
-  const message = cleanText(payload.message);
+  const name = cleanText(payload.name, 120);
+  const email = cleanText(payload.email, 254).toLowerCase();
+  const intent = cleanText(payload.intent, 120) || "Portfolio contact";
+  const message = cleanText(payload.message, 3000);
 
   if (!name || !email || !message) {
     return NextResponse.json({ ok: false, error: "Name, email, and message are required." }, { status: 400 });
+  }
+
+  if (!isValidEmail(email)) {
+    return NextResponse.json({ ok: false, error: "Please enter a valid email address." }, { status: 400 });
+  }
+
+  if (message.length < 20) {
+    return NextResponse.json({ ok: false, error: "Please include a little more detail so I can respond usefully." }, { status: 400 });
   }
 
   if (resendApiKey) {
@@ -45,7 +90,11 @@ export async function POST(request: Request) {
         to: [contactEmail],
         reply_to: email,
         subject: `Portfolio: ${intent}`,
-        text: `Name: ${name}\nEmail: ${email}\nIntent: ${intent}\n\n${message}`,
+        text: `Name: ${name}
+Email: ${email}
+Intent: ${intent}
+
+${message}`,
       }),
     });
 

@@ -6,6 +6,8 @@ import { WaskiQuoteEstimator } from "@/components/WaskiZoneBusiness";
 export const metadata = {
   title: "Project Intake | WaskiZone",
   description: "Send a cleaner project inquiry to WaskiZone for software development or authorized cybersecurity support.",
+  alternates: { canonical: "/waskizone/contact" },
+  openGraph: { title: "Project Intake | WaskiZone", description: "Start a scoped software or authorized security conversation with WaskiZone.", url: "/waskizone/contact" },
 };
 
 export default function WaskiZoneContactPage() {

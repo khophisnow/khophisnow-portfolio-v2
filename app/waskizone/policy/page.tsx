@@ -5,6 +5,8 @@ import { waskiSecurityPolicy } from "@/lib/portfolio-data";
 export const metadata = {
   title: "Authorized Security Policy | WaskiZone",
   description: "The authorized security policy for WaskiZone and W4sk1Z0n3 cybersecurity support.",
+  alternates: { canonical: "/waskizone/policy" },
+  openGraph: { title: "Authorized Security Policy | WaskiZone", description: "Scope, permission, reporting, and safety boundaries for WaskiZone security work.", url: "/waskizone/policy" },
 };
 
 export default function WaskiZonePolicyPage() {

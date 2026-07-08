@@ -2,7 +2,7 @@ import { Binary, LockKeyhole, Radar, Terminal } from "lucide-react";
 import { SourceBackLink } from "@/components/SourceBackLink";
 import { labItems, writeupPosts } from "@/lib/portfolio-data";
 
-export const metadata = { title: "W4sk1Z0n3 | Cybersecurity Services", icons: { icon: "/brand/waskizone/favicon/favicon.ico" } };
+export const metadata = { title: "W4sk1Z0n3 | Cybersecurity Services", description: "Authorized cybersecurity support for API review, access-control checks, hardening guidance, and defensive security training.", icons: { icon: "/brand/waskizone/favicon/favicon.ico" } };
 
 const serviceAreas = [
   "Authorized web and API security review",

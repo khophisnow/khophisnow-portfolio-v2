@@ -29,7 +29,18 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Params }) {
   const { slug } = await params;
   const service = waskiServiceDetails.find((item) => item.slug === slug);
-  return { title: service ? `${service.title} | WaskiZone` : "WaskiZone Services" };
+  if (!service) return { title: "WaskiZone Services" };
+
+  return {
+    title: `${service.title} | WaskiZone`,
+    description: service.summary,
+    alternates: { canonical: `/waskizone/services/${service.slug}` },
+    openGraph: {
+      title: `${service.title} | WaskiZone`,
+      description: service.summary,
+      url: `/waskizone/services/${service.slug}`,
+    },
+  };
 }
 
 export default async function WaskiServicePage({ params }: { params: Params }) {

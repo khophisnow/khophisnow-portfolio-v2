@@ -10,7 +10,7 @@ export async function GET() {
     return new NextResponse(file, {
       headers: {
         "content-type": "application/json; charset=utf-8",
-        "cache-control": "no-store, max-age=0",
+        "cache-control": "public, s-maxage=3600, stale-while-revalidate=86400",
       },
     });
   } catch {

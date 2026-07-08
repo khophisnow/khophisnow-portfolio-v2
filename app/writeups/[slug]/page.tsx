@@ -18,7 +18,19 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
   const post = writeupPosts.find((item) => item.slug === slug);
-  return post ? { title: `${post.title} | KhophiSnow Writeups`, description: post.body[0] } : {};
+  if (!post) return {};
+
+  return {
+    title: `${post.title} | KhophiSnow Writeups`,
+    description: post.body[0],
+    alternates: { canonical: `/writeups/${post.slug}` },
+    openGraph: {
+      title: `${post.title} | KhophiSnow Writeups`,
+      description: post.body[0],
+      url: `/writeups/${post.slug}`,
+      type: "article",
+    },
+  };
 }
 
 export default async function WriteupPage({ params }: { params: Promise<{ slug: string }> }) {

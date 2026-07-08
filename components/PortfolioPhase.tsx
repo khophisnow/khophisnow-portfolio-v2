@@ -137,7 +137,7 @@ export function PreviewReel() {
               <p className="font-mono text-xs uppercase text-cyan">{asset.project}</p>
               <h3 className="mt-2 text-lg font-black text-white">{asset.title}</h3>
               <p className="mt-2 text-xs leading-5 text-white/52">{asset.type}</p>
-              {"liveUrl" in asset && <a href={asset.liveUrl} target="_blank" rel="noreferrer" className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-mint hover:text-white">Open live<Maximize2 size={15} /></a>}
+              {"liveUrl" in asset && <a href={asset.liveUrl} target="_blank" rel="noopener noreferrer" className="mt-4 inline-flex items-center gap-2 text-sm font-bold text-mint hover:text-white">Open live<Maximize2 size={15} /></a>}
             </div>
           </article>
         ))}

@@ -192,8 +192,8 @@ export function HackChallenge() {
     <div className="border border-white/10 bg-panel/75 p-5">
       <div className="flex items-center gap-2 text-mint"><Terminal size={18} /><p className="font-mono text-xs uppercase">Hack the site mini challenge</p></div>
       <p className="mt-4 text-sm leading-7 text-white/65">Harmless puzzle: in a multi-school system, what control helps prevent one school from reading another school&apos;s data?</p>
-      <div className="mt-4 flex flex-col gap-2 sm:flex-row"><input value={answer} onChange={(event) => setAnswer(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") check(); }} placeholder="type answer" className="min-w-0 flex-1 border border-white/10 bg-black/35 px-3 py-3 font-mono text-sm text-white outline-none focus:border-mint" /><button type="button" onClick={check} className="bg-mint px-4 py-3 font-bold text-ink hover:bg-white">Submit</button></div>
-      {solved ? <p className="mt-4 font-mono text-sm text-mint">Correct. Security starts with boundaries.</p> : <p className="mt-4 font-mono text-xs text-white/42">Hint: role checks or tenant isolation</p>}
+      <div className="mt-4 flex flex-col gap-2 sm:flex-row"><label className="min-w-0 flex-1"><span className="sr-only">Challenge answer</span><input value={answer} onChange={(event) => setAnswer(event.target.value)} onKeyDown={(event) => { if (event.key === "Enter") check(); }} placeholder="type answer" className="w-full border border-white/10 bg-black/35 px-3 py-3 font-mono text-sm text-white outline-none focus:border-mint" /></label><button type="button" onClick={check} className="bg-mint px-4 py-3 font-bold text-ink hover:bg-white">Submit</button></div>
+      {solved ? <p role="status" aria-live="polite" className="mt-4 font-mono text-sm text-mint">Correct. Security starts with boundaries.</p> : <p className="mt-4 font-mono text-xs text-white/42">Hint: role checks or tenant isolation</p>}
     </div>
   );
 }
@@ -278,7 +278,7 @@ export function GitHubActivity() {
       {status === "offline" && <p className="mt-4 text-sm text-white/50">Activity feed is unavailable right now. The profile link still works.</p>}
       <div className="mt-4 space-y-3">
         {feed?.items.slice(0, 2).map((event) => (
-          <a key={event.id} href={event.url} target="_blank" rel="noreferrer" className="block border border-white/10 bg-black/25 p-3 text-sm text-white/65 hover:border-mint">
+          <a key={event.id} href={event.url} target="_blank" rel="noopener noreferrer" className="block border border-white/10 bg-black/25 p-3 text-sm text-white/65 hover:border-mint">
             <span className="flex items-center justify-between gap-3"><span className="font-mono text-xs text-cyan">{event.title}</span><span className="font-mono text-[10px] uppercase text-white/35">{formatActivityTime(event.publishedAt)}</span></span>
             <span className="mt-1 block font-bold text-white">{event.repo}</span>
             <span className="mt-2 block text-white/52">{event.summary}</span>

@@ -200,18 +200,30 @@ export function ContactForm() {
     <form onSubmit={submit} className="border border-white/10 bg-panel/70 p-5">
       <p className="font-mono text-xs uppercase text-mint">Contact form</p>
       <div className="mt-4 grid gap-3">
-        <select value={intent} onChange={(event) => setIntent(event.target.value)} className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint">
-          <option>Backend/API opportunity</option>
-          <option>Secure system review</option>
-          <option>Project collaboration</option>
-          <option>Mentorship or training</option>
-        </select>
-        <input name="name" required placeholder="Name" className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint" />
-        <input name="email" required type="email" placeholder="Email" className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint" />
-        <textarea name="message" required placeholder="What should we build or secure?" rows={5} className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint" />
+        <label className="grid gap-2">
+          <span className="sr-only">Contact intent</span>
+          <select value={intent} onChange={(event) => setIntent(event.target.value)} className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint">
+            <option>Backend/API opportunity</option>
+            <option>Secure system review</option>
+            <option>Project collaboration</option>
+            <option>Mentorship or training</option>
+          </select>
+        </label>
+        <label className="grid gap-2">
+          <span className="sr-only">Name</span>
+          <input name="name" required autoComplete="name" placeholder="Name" className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint" />
+        </label>
+        <label className="grid gap-2">
+          <span className="sr-only">Email</span>
+          <input name="email" required type="email" autoComplete="email" placeholder="Email" className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint" />
+        </label>
+        <label className="grid gap-2">
+          <span className="sr-only">Project message</span>
+          <textarea name="message" required minLength={20} placeholder="What should we build or secure?" rows={5} className="border border-white/10 bg-black/35 px-3 py-3 text-sm text-white outline-none focus:border-mint" />
+        </label>
         <button disabled={status === "sending"} className="inline-flex items-center justify-center gap-2 bg-mint px-4 py-3 font-bold text-ink hover:bg-white disabled:cursor-wait disabled:opacity-60"><Send size={17} />{status === "sending" ? "Sending..." : "Send message"}</button>
       </div>
-      {message && <p className={`mt-3 text-xs ${statusClass}`}>{message}</p>}
+      {message && <p role="status" aria-live="polite" className={`mt-3 text-xs ${statusClass}`}>{message}</p>}
     </form>
   );
 }
