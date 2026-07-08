@@ -20,28 +20,27 @@ type LoadingAtmosphereProps = {
 };
 
 export function LoadingAtmosphere({ eyebrow, title, autoDismiss = false, showSkip = false, duration = 5200 }: LoadingAtmosphereProps) {
-  const [scene, setScene] = useState<(typeof scenes)[number]>(scenes[0]);
+  const [scene, setScene] = useState<(typeof scenes)[number] | null>(null);
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
     const selectTimer = window.setTimeout(() => {
-      const selected = scenes[Math.floor(Math.random() * scenes.length)];
-      setScene(selected);
+      setScene(scenes[Math.floor(Math.random() * scenes.length)]);
     }, 0);
     return () => window.clearTimeout(selectTimer);
   }, []);
 
   useEffect(() => {
-    if (!autoDismiss) return;
+    if (!autoDismiss || !scene) return;
     const closeTimer = window.setTimeout(() => setVisible(false), duration);
     return () => window.clearTimeout(closeTimer);
-  }, [autoDismiss, duration]);
+  }, [autoDismiss, duration, scene]);
 
   const videoClassName = useMemo(() => {
     const base = "absolute inset-0 h-full w-full object-center opacity-70 mix-blend-screen saturate-150 contrast-125";
-    if (scene.fit === "contain") return `${base} object-cover scale-[1.14] sm:scale-[1.04]`;
+    if (scene?.fit === "contain") return `${base} object-cover scale-[1.14] sm:scale-[1.04]`;
     return `${base} scale-[1.04] object-cover`;
-  }, [scene.fit]);
+  }, [scene?.fit]);
 
   if (!visible) return null;
 
@@ -50,7 +49,7 @@ export function LoadingAtmosphere({ eyebrow, title, autoDismiss = false, showSki
       className="fixed left-0 top-0 z-[100] h-[125vh] w-[125vw] overflow-hidden bg-ink bg-cover bg-center text-white"
       style={{ backgroundImage: "linear-gradient(180deg, rgba(3,6,5,0.22), rgba(3,6,5,0.96)), url('/images/operator-cockpit.jpeg')" }}
     >
-      <video
+      {scene && <video
         src={scene.src}
         autoPlay
         muted
@@ -61,7 +60,7 @@ export function LoadingAtmosphere({ eyebrow, title, autoDismiss = false, showSki
         onLoadedMetadata={(event) => { event.currentTarget.playbackRate = 3; }}
         className={videoClassName}
         aria-label={`${eyebrow} ${scene.label}`}
-      />
+      />}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_52%_38%,rgba(0,220,255,0.08),rgba(3,6,5,0.70)_58%,rgba(3,6,5,0.97))]" />
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,31,48,0.16),transparent_36%,rgba(0,190,255,0.12))]" />
       <div className="absolute inset-0 cyber-grid opacity-[0.18]" />
