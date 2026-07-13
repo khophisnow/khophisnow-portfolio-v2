@@ -30,8 +30,8 @@ export function TruthOrDareSpotlight() {
             <Gamepad2 size={26} />
             <p className="font-mono text-sm uppercase">Playable portfolio build</p>
           </div>
-          <h2 className="mt-5 text-4xl font-black leading-tight text-white md:text-5xl">DareDeck, built as a complete local-first product.</h2>
-          <p className="mt-5 text-sm leading-7 text-white/64">This project turns a simple party idea into a product-grade web app: session setup, player order, custom packs, scoring rules, history, export/import, and a structure ready for multiplayer later.</p>
+          <h2 className="mt-5 text-4xl font-black leading-tight text-white md:text-5xl">DareDeck, built as a local-first product with online rooms.</h2>
+          <p className="mt-5 text-sm leading-7 text-white/64">This project turns a simple party idea into a product-grade web app: session setup, player order, custom packs, scoring rules, history, export/import, and optional Supabase-powered online room sync.</p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/truth-or-dare" className="inline-flex items-center gap-2 bg-mint px-5 py-3 font-bold text-ink hover:bg-white">Play the game<ArrowUpRight size={17} /></Link>
             <Link href="/case-files/truth-or-dare" className="inline-flex items-center gap-2 border border-white/18 px-5 py-3 font-bold text-white hover:border-cyan hover:text-cyan">Read case file</Link>
@@ -77,7 +77,7 @@ export function MobileProjectStoryMode() {
         { title: "Players set the order", detail: "Names can be added, removed, and reordered before the first turn starts." },
         { title: "Packs are validated", detail: "JSON, CSV, and TXT uploads are previewed before they become active questions." },
         { title: "The engine draws fairly", detail: "Truth and dare pools avoid repeats and reset only after the active pool is exhausted." },
-        { title: "The session is portable", detail: "Scores, history, packs, and room state can be exported for future multiplayer expansion." },
+        { title: "The session is portable", detail: "Scores, history, packs, and room state can sync through online rooms or travel through export/import." },
       ]
       : [
         { title: "A campus user opens a feature", detail: "Events, media, comments, bookmarks, and notifications begin as simple user actions." },
@@ -114,7 +114,7 @@ export function DemoPreviewStrip() {
   const previews = [
     { project: "EduManage", src: "/images/edumanage-demo.webp", label: "multi-tenant school workflow", href: "/case-files/edumanage" },
     { project: "WhatsUpUCC", src: "/images/whats-up-ucc.webp", label: "campus event and media flow", href: "/case-files/whatsupucc" },
-    { project: "DareDeck", src: "/images/truth-or-dare.png", label: "local-first game product", href: "/truth-or-dare" },
+    { project: "DareDeck", src: "/images/truth-or-dare.png", label: "local-first online room product", href: "/truth-or-dare" },
   ];
   return (
     <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">

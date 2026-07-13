@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { type ChangeEvent, type ReactNode, useEffect, useMemo, useRef, useState } from "react";
+import { createSupabaseBrowserClient } from "@/lib/supabase/client";
+import { type ChangeEvent, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   ArrowLeft,
   Clipboard,
@@ -49,6 +50,19 @@ type GameState = {
   lastAutoType: QuestionType;
   history: Turn[];
   sound: boolean;
+};
+
+type OnlineRoom = {
+  enabled: boolean;
+  roomId: string;
+  status: "local" | "creating" | "joining" | "connected" | "saving" | "offline" | "error";
+  error: string;
+};
+
+type DareDeckRoomRecord = {
+  room_id: string;
+  state: GameState;
+  updated_at: string;
 };
 
 const storageKey = "khophi-truth-or-dare:v1";
@@ -167,13 +181,23 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
   const [sessionText, setSessionText] = useState("");
   const [timer, setTimer] = useState(30);
   const [timerRunning, setTimerRunning] = useState(false);
+  const [onlineRoom, setOnlineRoom] = useState<OnlineRoom>({ enabled: false, roomId: "", status: "local", error: "" });
+  const supabase = useMemo(() => createSupabaseBrowserClient(), []);
   const appRef = useRef<HTMLElement>(null);
   const restored = useRef(false);
   const saveReady = useRef(false);
+  const onlineRoomRef = useRef(onlineRoom);
+  const applyingRemoteState = useRef(false);
+  const onlineSyncTimer = useRef<number | null>(null);
+  const lastOnlineState = useRef("");
 
   useEffect(() => {
     appRef.current?.setAttribute("data-hydrated", "true");
   }, []);
+
+  useEffect(() => {
+    onlineRoomRef.current = onlineRoom;
+  }, [onlineRoom]);
 
   useEffect(() => {
     if (restored.current) return;
@@ -204,10 +228,39 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
 
   const activeQuestions = useMemo(() => state.packs.filter((pack) => state.selectedPackIds.includes(pack.id)).flatMap((pack) => pack.questions), [state.packs, state.selectedPackIds]);
   const currentPlayer = state.players[state.currentPlayerIndex] || state.players[0];
-  const inviteUrl = typeof window === "undefined" ? `/truth-or-dare?room=${state.roomId}` : `${window.location.origin}/truth-or-dare?room=${state.roomId}`;
+  const onlineInviteUrl = typeof window === "undefined" ? `/truth-or-dare?online=1&room=${onlineRoom.roomId || state.roomId}` : `${window.location.origin}/truth-or-dare?online=1&room=${onlineRoom.roomId || state.roomId}`;
+  const localInviteUrl = typeof window === "undefined" ? `/truth-or-dare?room=${state.roomId}` : `${window.location.origin}/truth-or-dare?room=${state.roomId}`;
+  const inviteUrl = onlineRoom.enabled ? onlineInviteUrl : localInviteUrl;
   const rankings = [...state.players].sort((a, b) => b.score - a.score);
 
-  const update = (patch: Partial<GameState>) => setState((value) => ({ ...value, ...patch }));
+  const queueOnlineSync = (nextState: GameState) => {
+    const room = onlineRoomRef.current;
+    if (!supabase || !room.enabled || applyingRemoteState.current) return;
+    const payloadState = { ...nextState, roomId: room.roomId };
+    const serialized = JSON.stringify(payloadState);
+    if (serialized === lastOnlineState.current) return;
+    if (onlineSyncTimer.current) window.clearTimeout(onlineSyncTimer.current);
+    setOnlineRoom((value) => ({ ...value, status: "saving", error: "" }));
+    onlineSyncTimer.current = window.setTimeout(async () => {
+      const { error } = await supabase.from("daredeck_rooms").upsert({ room_id: room.roomId, state: payloadState, updated_at: new Date().toISOString() });
+      if (error) {
+        setOnlineRoom((value) => ({ ...value, status: "error", error: error.message }));
+        return;
+      }
+      lastOnlineState.current = serialized;
+      setOnlineRoom((value) => ({ ...value, status: "connected", error: "" }));
+    }, 450);
+  };
+
+  const commitState = (nextOrUpdater: GameState | ((value: GameState) => GameState)) => {
+    setState((value) => {
+      const next = typeof nextOrUpdater === "function" ? nextOrUpdater(value) : nextOrUpdater;
+      queueOnlineSync(next);
+      return next;
+    });
+  };
+
+  const update = (patch: Partial<GameState>) => commitState((value) => ({ ...value, ...patch }));
   const playSound = () => {
     if (!state.sound || typeof window === "undefined") return;
     const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
@@ -224,7 +277,7 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
   };
 
   const startGame = () => {
-    setState((value) => {
+    commitState((value) => {
       const players = value.players.map((player) => ({ ...player, name: player.name.trim() })).filter((player) => player.name);
       if (players.length < 2) return value;
       return { ...value, stage: "play", players, currentPlayerIndex: 0, currentQuestion: null, history: [], usedTruthIds: [], usedDareIds: [] };
@@ -254,7 +307,7 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
     const resetPatch = available.length ? {} : type === "truth" ? { usedTruthIds: [] } : { usedDareIds: [] };
     update({ ...resetPatch, currentQuestion: selected, lastAutoType: type, ...(type === "truth" ? { usedTruthIds: [...(available.length ? state.usedTruthIds : []), selected.id] } : { usedDareIds: [...(available.length ? state.usedDareIds : []), selected.id] }) });
     setTimer(selected.type === "dare" ? 30 : 0);
-    setTimerRunning(false);
+    setTimerRunning(selected.type === "dare");
     playSound();
   };
 
@@ -300,14 +353,95 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
     try {
       const parsed = JSON.parse(sessionText) as GameState;
       if (!Array.isArray(parsed.players) || !Array.isArray(parsed.packs)) throw new Error();
-      setState({ ...createInitialState(), ...parsed, currentQuestion: null });
+      commitState({ ...createInitialState(), ...parsed, currentQuestion: null });
       setImportError("");
     } catch {
       setImportError("Session import failed. Paste a valid exported game session.");
     }
   };
 
-  const resetAll = () => setState({ ...createInitialState(), roomId: id("room"), players: [createPlayer("KhophiSnow"), createPlayer("Guest")] });
+  const resetAll = () => commitState({ ...createInitialState(), roomId: id("room"), players: [createPlayer("KhophiSnow"), createPlayer("Guest")] });
+
+  const connectOnlineRoom = useCallback(async (roomId: string) => {
+    if (!supabase) {
+      setOnlineRoom({ enabled: false, roomId: "", status: "offline", error: "Supabase is not configured for online rooms yet." });
+      return;
+    }
+    const cleanRoomId = roomId.trim();
+    if (!cleanRoomId) return;
+    setOnlineRoom({ enabled: false, roomId: cleanRoomId, status: "joining", error: "" });
+    const { data, error } = await supabase.from("daredeck_rooms").select("room_id,state,updated_at").eq("room_id", cleanRoomId).maybeSingle<DareDeckRoomRecord>();
+    if (error || !data?.state) {
+      setOnlineRoom({ enabled: false, roomId: cleanRoomId, status: "error", error: error?.message || "Online room not found." });
+      return;
+    }
+    applyingRemoteState.current = true;
+    const nextState = { ...createInitialState(), ...data.state, roomId: cleanRoomId };
+    lastOnlineState.current = JSON.stringify(nextState);
+    setState(nextState);
+    setOnlineRoom({ enabled: true, roomId: cleanRoomId, status: "connected", error: "" });
+    window.queueMicrotask(() => { applyingRemoteState.current = false; });
+  }, [supabase]);
+
+  const createOnlineRoom = async () => {
+    if (!supabase) {
+      setOnlineRoom({ enabled: false, roomId: "", status: "offline", error: "Add Supabase URL and publishable key to enable online rooms." });
+      return;
+    }
+    const roomId = id("room");
+    const nextState = { ...state, roomId };
+    setOnlineRoom({ enabled: false, roomId, status: "creating", error: "" });
+    const { error } = await supabase.from("daredeck_rooms").upsert({ room_id: roomId, state: nextState, updated_at: new Date().toISOString() });
+    if (error) {
+      setOnlineRoom({ enabled: false, roomId, status: "error", error: error.message });
+      return;
+    }
+    lastOnlineState.current = JSON.stringify(nextState);
+    setState(nextState);
+    setOnlineRoom({ enabled: true, roomId, status: "connected", error: "" });
+    window.history.replaceState(null, "", `/truth-or-dare?online=1&room=${roomId}`);
+  };
+
+  const leaveOnlineRoom = () => {
+    setOnlineRoom({ enabled: false, roomId: "", status: "local", error: "" });
+    lastOnlineState.current = "";
+    if (typeof window !== "undefined") window.history.replaceState(null, "", "/truth-or-dare");
+  };
+
+  useEffect(() => {
+    if (!supabase || typeof window === "undefined") return;
+    const params = new URLSearchParams(window.location.search);
+    const roomId = params.get("room");
+    const wantsOnline = params.get("online") === "1";
+    if (!roomId || !wantsOnline || onlineRoomRef.current.enabled || onlineRoomRef.current.status === "joining") return;
+    void connectOnlineRoom(roomId);
+  }, [connectOnlineRoom, supabase]);
+
+  useEffect(() => {
+    if (!supabase || !onlineRoom.enabled || !onlineRoom.roomId) return;
+    const channel = supabase
+      .channel(`daredeck-room-${onlineRoom.roomId}`)
+      .on("postgres_changes", { event: "UPDATE", schema: "public", table: "daredeck_rooms", filter: `room_id=eq.${onlineRoom.roomId}` }, (payload) => {
+        const record = payload.new as Partial<DareDeckRoomRecord>;
+        if (!record.state) return;
+        const nextState = { ...createInitialState(), ...record.state, roomId: onlineRoom.roomId };
+        const serialized = JSON.stringify(nextState);
+        if (serialized === lastOnlineState.current) return;
+        applyingRemoteState.current = true;
+        lastOnlineState.current = serialized;
+        setState(nextState);
+        setOnlineRoom((value) => ({ ...value, status: "connected", error: "" }));
+        window.queueMicrotask(() => { applyingRemoteState.current = false; });
+      })
+      .subscribe((status) => {
+        if (status === "SUBSCRIBED") setOnlineRoom((value) => ({ ...value, status: "connected", error: "" }));
+        if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") setOnlineRoom((value) => ({ ...value, status: "error", error: "Realtime connection interrupted." }));
+      });
+
+    return () => {
+      void supabase.removeChannel(channel);
+    };
+  }, [onlineRoom.enabled, onlineRoom.roomId, supabase]);
 
   return (
     <main ref={appRef} data-testid="truth-dare-app" data-hydrated="false" className="scanline min-h-screen bg-ink text-white">
@@ -322,7 +456,7 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
       </header>
 
       {state.stage === "landing" && <Landing onStart={() => update({ stage: "setup" })} />}
-      {state.stage === "setup" && <Setup state={state} activeQuestions={activeQuestions} inviteUrl={inviteUrl} update={update} addPlayer={addPlayer} movePlayer={movePlayer} handlePackFile={handlePackFile} importError={importError} importPreview={importPreview} acceptPack={acceptPack} startGame={startGame} exportSession={exportSession} importSession={importSession} sessionText={sessionText} setSessionText={setSessionText} resetAll={resetAll} />}
+      {state.stage === "setup" && <Setup state={state} activeQuestions={activeQuestions} inviteUrl={inviteUrl} update={update} addPlayer={addPlayer} movePlayer={movePlayer} handlePackFile={handlePackFile} importError={importError} importPreview={importPreview} acceptPack={acceptPack} startGame={startGame} exportSession={exportSession} importSession={importSession} sessionText={sessionText} setSessionText={setSessionText} resetAll={resetAll} onlineRoom={onlineRoom} onlineAvailable={Boolean(supabase)} createOnlineRoom={createOnlineRoom} leaveOnlineRoom={leaveOnlineRoom} />}
       {state.stage === "play" && <PlayStage state={state} currentPlayer={currentPlayer} rankings={rankings} activeQuestions={activeQuestions} chooseQuestion={chooseQuestion} markResult={markResult} timer={timer} timerRunning={timerRunning} setTimerRunning={setTimerRunning} finish={() => update({ stage: "finish" })} />}
       {state.stage === "finish" && <Finish rankings={rankings} restart={() => update({ stage: "setup", currentQuestion: null, currentPlayerIndex: 0 })} resetAll={resetAll} />}
     </main>
@@ -336,9 +470,9 @@ function Landing({ onStart }: { onStart: () => void }) {
 function UsersIcon() { return <Sparkles size={20} />; }
 function Feature({ icon, title, text }: { icon: ReactNode; title: string; text: string }) { return <article className="border border-white/10 bg-black/25 p-5"><span className="text-mint">{icon}</span><h3 className="mt-4 text-xl font-black text-white">{title}</h3><p className="mt-3 text-sm leading-6 text-white/58">{text}</p></article>; }
 
-function Setup(props: { state: GameState; activeQuestions: Question[]; inviteUrl: string; update: (patch: Partial<GameState>) => void; addPlayer: () => void; movePlayer: (from: number, direction: -1 | 1) => void; handlePackFile: (event: ChangeEvent<HTMLInputElement>) => void; importError: string; importPreview: Pack | null; acceptPack: () => void; startGame: () => void; exportSession: () => void; importSession: () => void; sessionText: string; setSessionText: (value: string) => void; resetAll: () => void }) {
+function Setup(props: { state: GameState; activeQuestions: Question[]; inviteUrl: string; update: (patch: Partial<GameState>) => void; addPlayer: () => void; movePlayer: (from: number, direction: -1 | 1) => void; handlePackFile: (event: ChangeEvent<HTMLInputElement>) => void; importError: string; importPreview: Pack | null; acceptPack: () => void; startGame: () => void; exportSession: () => void; importSession: () => void; sessionText: string; setSessionText: (value: string) => void; resetAll: () => void; onlineRoom: OnlineRoom; onlineAvailable: boolean; createOnlineRoom: () => void; leaveOnlineRoom: () => void }) {
   const { state, update } = props;
-  return <section className="relative mx-auto max-w-7xl px-5 py-14 lg:px-8"><SectionHeader eyebrow="Create room" title="Set up the session" text="Add players, choose a mode, select packs, and keep a room link ready for future multiplayer support." /><div className="mt-10 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]"><div className="space-y-6"><Panel title="Game details"><label className="block"><span className="font-mono text-xs uppercase text-mint">Game name</span><input value={state.gameName} onChange={(event) => update({ gameName: event.target.value })} className="mt-2 w-full border border-white/10 bg-black/35 px-4 py-3 text-white outline-none focus:border-mint" /></label><div className="mt-4 grid gap-3 sm:grid-cols-3">{(["classic", "random", "challenge"] as GameMode[]).map((mode) => <button key={mode} type="button" onClick={() => update({ mode })} className={`border px-4 py-3 text-left text-sm font-bold capitalize ${state.mode === mode ? "border-mint bg-mint text-ink" : "border-white/12 text-white/66 hover:border-mint"}`}>{mode}<span className="mt-1 block text-xs font-normal opacity-70">{mode === "classic" ? "manual choice" : mode === "random" ? "system choice" : "hard dares score more"}</span></button>)}</div></Panel><Panel title="Players"><div className="space-y-3">{state.players.map((player, index) => <div key={player.id} className="grid gap-2 sm:grid-cols-[2rem_1fr_auto]"><span className="flex size-9 items-center justify-center border border-mint/25 bg-mint/10 font-mono text-xs text-mint">{index + 1}</span><input value={player.name} onChange={(event) => update({ players: state.players.map((item) => item.id === player.id ? { ...item, name: event.target.value } : item) })} className="border border-white/10 bg-black/35 px-3 py-2 text-white outline-none focus:border-mint" /><div className="flex gap-2"><button type="button" onClick={() => props.movePlayer(index, -1)} className="border border-white/10 px-2 text-white/60 hover:border-mint">↑</button><button type="button" onClick={() => props.movePlayer(index, 1)} className="border border-white/10 px-2 text-white/60 hover:border-mint">↓</button><button type="button" onClick={() => update({ players: state.players.filter((item) => item.id !== player.id) })} className="border border-red-300/20 px-2 text-red-200 hover:border-red-300"><Trash2 size={15} /></button></div></div>)}</div><button type="button" onClick={props.addPlayer} className="mt-4 inline-flex items-center gap-2 border border-mint/35 px-4 py-3 font-bold text-mint hover:bg-mint hover:text-ink"><Plus size={16} />Add player</button></Panel></div><div className="space-y-6"><Panel title="Question packs"><div className="grid gap-3">{state.packs.map((pack) => <label key={pack.id} className="flex items-start gap-3 border border-white/10 bg-black/25 p-4"><input type="checkbox" checked={state.selectedPackIds.includes(pack.id)} onChange={(event) => update({ selectedPackIds: event.target.checked ? [...state.selectedPackIds, pack.id] : state.selectedPackIds.filter((id) => id !== pack.id) })} className="mt-1" /><span className="flex-1"><span className="block font-bold text-white">{pack.name}</span><span className="text-xs text-white/45">{pack.questions.filter((q) => q.type === "truth").length} truths / {pack.questions.filter((q) => q.type === "dare").length} dares</span></span>{pack.id !== defaultPack.id && <button type="button" onClick={() => update({ packs: state.packs.filter((item) => item.id !== pack.id), selectedPackIds: state.selectedPackIds.filter((id) => id !== pack.id) })} className="text-red-200"><Trash2 size={16} /></button>}</label>)}</div><label className="mt-4 flex cursor-pointer items-center justify-center gap-2 border border-dashed border-mint/35 px-4 py-5 font-bold text-mint hover:bg-mint/10"><Import size={17} />Upload JSON, CSV, or TXT<input type="file" accept=".json,.csv,.txt" onChange={props.handlePackFile} className="sr-only" /></label>{props.importError && <p className="mt-3 border border-red-300/25 bg-red-500/10 p-3 text-sm text-red-100">{props.importError}</p>}{props.importPreview && <div className="mt-4 border border-cyan/25 bg-cyan/10 p-4"><p className="font-bold text-white">Preview: {props.importPreview.name}</p><p className="mt-2 text-xs text-white/60">{props.importPreview.questions.length} valid questions ready.</p><button type="button" onClick={props.acceptPack} className="mt-3 bg-mint px-4 py-2 font-bold text-ink">Add pack</button></div>}<div className="mt-4 grid gap-2 md:grid-cols-3">{(["json", "csv", "txt"] as const).map((type) => <details key={type} className="border border-white/10 bg-black/25 p-3"><summary className="cursor-pointer font-mono text-xs uppercase text-cyan">{type} template</summary><pre className="mt-3 whitespace-pre-wrap break-words text-[11px] leading-5 text-white/55">{sampleTemplate(type)}</pre></details>)}</div></Panel><Panel title="Room and session"><p className="text-sm text-white/58">Room ID: <span className="font-mono text-mint">{state.roomId}</span></p><button type="button" onClick={() => navigator.clipboard?.writeText(props.inviteUrl)} className="mt-3 inline-flex items-center gap-2 border border-white/12 px-3 py-2 text-sm text-white/70 hover:border-mint"><Clipboard size={15} />Copy invite link</button><div className="mt-4 grid gap-3 sm:grid-cols-2"><button type="button" onClick={props.exportSession} className="border border-white/12 px-3 py-2 text-sm font-bold text-white/70 hover:border-cyan"><Download className="mr-2 inline" size={15} />Export</button><button type="button" onClick={props.importSession} className="border border-white/12 px-3 py-2 text-sm font-bold text-white/70 hover:border-cyan"><FileJson className="mr-2 inline" size={15} />Import pasted</button></div><textarea value={props.sessionText} onChange={(event) => props.setSessionText(event.target.value)} placeholder="Exported session JSON appears here. Paste one to import." className="mt-3 min-h-28 w-full border border-white/10 bg-black/35 p-3 font-mono text-xs text-cyan outline-none focus:border-mint" /></Panel></div></div><div className="mt-8 flex flex-wrap gap-3"><button type="button" data-testid="truth-dare-start-session" onClick={props.startGame} disabled={state.players.filter((p) => p.name.trim()).length < 2 || props.activeQuestions.length < 2} className="inline-flex items-center gap-2 bg-mint px-5 py-3 font-bold text-ink disabled:cursor-not-allowed disabled:opacity-40"><Play size={18} />Start game</button><button type="button" onClick={props.resetAll} className="inline-flex items-center gap-2 border border-white/12 px-5 py-3 font-bold text-white/65 hover:border-red-300 hover:text-red-200"><RefreshCcw size={17} />Reset</button></div><ArchitectureBlock /></section>;
+  return <section className="relative mx-auto max-w-7xl px-5 py-14 lg:px-8"><SectionHeader eyebrow="Create room" title="Set up the session" text="Add players, choose a mode, select packs, and keep a room link ready for future multiplayer support." /><div className="mt-10 grid gap-6 lg:grid-cols-[0.95fr_1.05fr]"><div className="space-y-6"><Panel title="Game details"><label className="block"><span className="font-mono text-xs uppercase text-mint">Game name</span><input value={state.gameName} onChange={(event) => update({ gameName: event.target.value })} className="mt-2 w-full border border-white/10 bg-black/35 px-4 py-3 text-white outline-none focus:border-mint" /></label><div className="mt-4 grid gap-3 sm:grid-cols-3">{(["classic", "random", "challenge"] as GameMode[]).map((mode) => <button key={mode} type="button" onClick={() => update({ mode })} className={`border px-4 py-3 text-left text-sm font-bold capitalize ${state.mode === mode ? "border-mint bg-mint text-ink" : "border-white/12 text-white/66 hover:border-mint"}`}>{mode}<span className="mt-1 block text-xs font-normal opacity-70">{mode === "classic" ? "manual choice" : mode === "random" ? "system choice" : "hard dares score more"}</span></button>)}</div></Panel><Panel title="Players"><div className="space-y-3">{state.players.map((player, index) => <div key={player.id} className="grid gap-2 sm:grid-cols-[2rem_1fr_auto]"><span className="flex size-9 items-center justify-center border border-mint/25 bg-mint/10 font-mono text-xs text-mint">{index + 1}</span><input value={player.name} onChange={(event) => update({ players: state.players.map((item) => item.id === player.id ? { ...item, name: event.target.value } : item) })} className="border border-white/10 bg-black/35 px-3 py-2 text-white outline-none focus:border-mint" /><div className="flex gap-2"><button type="button" onClick={() => props.movePlayer(index, -1)} className="border border-white/10 px-2 text-white/60 hover:border-mint">↑</button><button type="button" onClick={() => props.movePlayer(index, 1)} className="border border-white/10 px-2 text-white/60 hover:border-mint">↓</button><button type="button" onClick={() => update({ players: state.players.filter((item) => item.id !== player.id) })} className="border border-red-300/20 px-2 text-red-200 hover:border-red-300"><Trash2 size={15} /></button></div></div>)}</div><button type="button" onClick={props.addPlayer} className="mt-4 inline-flex items-center gap-2 border border-mint/35 px-4 py-3 font-bold text-mint hover:bg-mint hover:text-ink"><Plus size={16} />Add player</button></Panel></div><div className="space-y-6"><Panel title="Question packs"><div className="grid gap-3">{state.packs.map((pack) => <label key={pack.id} className="flex items-start gap-3 border border-white/10 bg-black/25 p-4"><input type="checkbox" checked={state.selectedPackIds.includes(pack.id)} onChange={(event) => update({ selectedPackIds: event.target.checked ? [...state.selectedPackIds, pack.id] : state.selectedPackIds.filter((id) => id !== pack.id) })} className="mt-1" /><span className="flex-1"><span className="block font-bold text-white">{pack.name}</span><span className="text-xs text-white/45">{pack.questions.filter((q) => q.type === "truth").length} truths / {pack.questions.filter((q) => q.type === "dare").length} dares</span></span>{pack.id !== defaultPack.id && <button type="button" onClick={() => update({ packs: state.packs.filter((item) => item.id !== pack.id), selectedPackIds: state.selectedPackIds.filter((id) => id !== pack.id) })} className="text-red-200"><Trash2 size={16} /></button>}</label>)}</div><label className="mt-4 flex cursor-pointer items-center justify-center gap-2 border border-dashed border-mint/35 px-4 py-5 font-bold text-mint hover:bg-mint/10"><Import size={17} />Upload JSON, CSV, or TXT<input type="file" accept=".json,.csv,.txt" onChange={props.handlePackFile} className="sr-only" /></label>{props.importError && <p className="mt-3 border border-red-300/25 bg-red-500/10 p-3 text-sm text-red-100">{props.importError}</p>}{props.importPreview && <div className="mt-4 border border-cyan/25 bg-cyan/10 p-4"><p className="font-bold text-white">Preview: {props.importPreview.name}</p><p className="mt-2 text-xs text-white/60">{props.importPreview.questions.length} valid questions ready.</p><button type="button" onClick={props.acceptPack} className="mt-3 bg-mint px-4 py-2 font-bold text-ink">Add pack</button></div>}<div className="mt-4 grid gap-2 md:grid-cols-3">{(["json", "csv", "txt"] as const).map((type) => <details key={type} className="border border-white/10 bg-black/25 p-3"><summary className="cursor-pointer font-mono text-xs uppercase text-cyan">{type} template</summary><pre className="mt-3 whitespace-pre-wrap break-words text-[11px] leading-5 text-white/55">{sampleTemplate(type)}</pre></details>)}</div></Panel><Panel title="Room and session"><p className="text-sm text-white/58">Room ID: <span className="font-mono text-mint">{state.roomId}</span></p><div className="mt-4 border border-cyan/20 bg-cyan/10 p-4"><p className="font-mono text-xs uppercase text-cyan">Online room</p><p className="mt-2 text-sm leading-6 text-white/60">{props.onlineRoom.enabled ? "Live sync is active. Send the invite link to another player and both screens will update together." : props.onlineAvailable ? "Create an online room when you want this session to sync across devices." : "Online rooms need Supabase environment variables."}</p><div className="mt-4 flex flex-wrap gap-2"><button type="button" onClick={props.createOnlineRoom} disabled={!props.onlineAvailable || ["creating", "joining"].includes(props.onlineRoom.status)} className="border border-mint/35 px-3 py-2 text-sm font-bold text-mint hover:bg-mint hover:text-ink disabled:cursor-not-allowed disabled:opacity-40">{props.onlineRoom.enabled ? "Refresh online room" : "Create online room"}</button>{props.onlineRoom.enabled && <button type="button" onClick={props.leaveOnlineRoom} className="border border-white/12 px-3 py-2 text-sm font-bold text-white/62 hover:border-red-300 hover:text-red-200">Leave online</button>}</div><p className="mt-3 font-mono text-xs uppercase text-white/45">Status: <span className="text-mint">{props.onlineRoom.status}</span></p>{props.onlineRoom.error && <p className="mt-2 text-sm text-red-200">{props.onlineRoom.error}</p>}</div><button type="button" onClick={() => navigator.clipboard?.writeText(props.inviteUrl)} className="mt-3 inline-flex items-center gap-2 border border-white/12 px-3 py-2 text-sm text-white/70 hover:border-mint"><Clipboard size={15} />Copy {props.onlineRoom.enabled ? "online" : "local"} invite link</button><div className="mt-4 grid gap-3 sm:grid-cols-2"><button type="button" onClick={props.exportSession} className="border border-white/12 px-3 py-2 text-sm font-bold text-white/70 hover:border-cyan"><Download className="mr-2 inline" size={15} />Export</button><button type="button" onClick={props.importSession} className="border border-white/12 px-3 py-2 text-sm font-bold text-white/70 hover:border-cyan"><FileJson className="mr-2 inline" size={15} />Import pasted</button></div><textarea value={props.sessionText} onChange={(event) => props.setSessionText(event.target.value)} placeholder="Exported session JSON appears here. Paste one to import." className="mt-3 min-h-28 w-full border border-white/10 bg-black/35 p-3 font-mono text-xs text-cyan outline-none focus:border-mint" /></Panel></div></div><div className="mt-8 flex flex-wrap gap-3"><button type="button" data-testid="truth-dare-start-session" onClick={props.startGame} disabled={state.players.filter((p) => p.name.trim()).length < 2 || props.activeQuestions.length < 2} className="inline-flex items-center gap-2 bg-mint px-5 py-3 font-bold text-ink disabled:cursor-not-allowed disabled:opacity-40"><Play size={18} />Start game</button><button type="button" onClick={props.resetAll} className="inline-flex items-center gap-2 border border-white/12 px-5 py-3 font-bold text-white/65 hover:border-red-300 hover:text-red-200"><RefreshCcw size={17} />Reset</button></div><ArchitectureBlock /></section>;
 }
 
 function PlayStage({ state, currentPlayer, rankings, activeQuestions, chooseQuestion, markResult, timer, timerRunning, setTimerRunning, finish }: { state: GameState; currentPlayer: Player; rankings: Player[]; activeQuestions: Question[]; chooseQuestion: (type?: QuestionType) => void; markResult: (result: Result) => void; timer: number; timerRunning: boolean; setTimerRunning: (value: boolean) => void; finish: () => void }) {
