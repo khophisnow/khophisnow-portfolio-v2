@@ -19,11 +19,11 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 | Mobile Experience | 7 | Good | Main mobile layout has been polished repeatedly. Needs a dedicated device-by-device QA checklist with screenshots. |
 | Backend/API | 7 | Good | Contact API and GitHub feed API are hardened for the current site size. No database-backed features are active yet. |
 | Frontend | 8 | Strong | App router, dynamic pages, videos, modes, loaders, and service flows are in place. Future work: visual regression checks. |
-| DevOps | 7 | Good | Vercel deploys, scheduled GitHub feed updates, and audit commands exist. Future work: CI workflow that runs the local audit gate. |
-| Testing | 5 | Needs Work | Manual checks and audit scripts exist, but no real unit, integration, or browser automation suite yet. |
+| DevOps | 8 | Strong | Vercel deploys, scheduled GitHub feed updates, audit commands, and a GitHub Actions quality gate are in place. |
+| Testing | 7 | Good | Playwright browser smoke tests now cover key desktop/mobile routes, source-aware navigation, WaskiZone service flow, contact mail links, and visible overflow checks. |
 | Product Quality | 8 | Strong | Portfolio and WaskiZone now tell a clearer story. Future work: more proof, testimonials, project media, and tighter conversion copy. |
 
-**Overall score:** 7.5 / 10
+**Overall score:** 7.8 / 10
 
 ## Completed From The Audit Prompt
 
@@ -37,6 +37,9 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 - Combined local quality gate added with `npm run audit:all`.
 - WaskiZone loader behavior improved to avoid unnecessary video loading.
 - Unused large screenshots removed from `public/images`.
+- Playwright browser smoke tests added for desktop and mobile routes.
+- GitHub Actions quality gate now runs audits and browser smoke tests.
+- Next.js and PostCSS patched to resolve npm audit findings.
 
 ## Remaining High-Value Work
 
@@ -44,7 +47,6 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 
 | Problem | Why It Matters | Recommended Solution | Effort |
 | --- | --- | --- | --- |
-| No browser automation | Manual checking can miss mobile, navigation, and form regressions. | Add Playwright smoke tests for home, WaskiZone, writeups, case studies, contact, and loaders. | Medium |
 | No Lighthouse budget | Performance can slowly regress with videos and images. | Add Lighthouse/Pagespeed targets or a manual release checklist with asset budgets. | Medium |
 | Large video reliance | Videos create strong identity but can hurt first-load experience. | Compress videos, add mobile-specific variants, and set size budgets. | Medium |
 | No visual regression checks | UI changes can break mobile spacing without failing build. | Add screenshot checkpoints for key routes. | Medium |
@@ -76,13 +78,13 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 - [x] Static and live audits exist.
 - [x] Large public asset audit exists.
 - [x] Unused heavy screenshots removed.
-- [ ] Add browser automation tests.
+- [x] Add browser automation tests.
 - [ ] Add Lighthouse or performance budget checks.
 - [ ] Compress and/or create mobile versions of loader videos.
 - [ ] Perform keyboard and screen-reader QA.
 - [ ] Add visual regression screenshots for key pages.
 - [ ] Split oversized components into smaller modules.
-- [ ] Add a CI workflow for `npm run audit:all`.
-- [ ] Add dependency/security scanning to release process.
+- [x] Add a CI workflow for `npm run audit:all`.
+- [x] Add dependency/security scanning to release process.
 - [ ] Add more real project media and proof assets.
 - [ ] Revisit CMS/admin only after the static public site is fully stable.

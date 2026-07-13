@@ -46,7 +46,8 @@ export function LoadingAtmosphere({ eyebrow, title, autoDismiss = false, showSki
 
   return (
     <div
-      className="fixed left-0 top-0 z-[100] h-[125vh] w-[125vw] overflow-hidden bg-ink bg-cover bg-center text-white"
+      data-testid="atmosphere-loader"
+      className="fixed left-0 top-0 z-[100] h-[125dvh] w-[125vw] overflow-hidden bg-ink bg-cover bg-center text-white"
       style={{ backgroundImage: "linear-gradient(180deg, rgba(3,6,5,0.22), rgba(3,6,5,0.96)), url('/images/operator-cockpit.jpeg')" }}
     >
       {scene && <video
@@ -65,7 +66,7 @@ export function LoadingAtmosphere({ eyebrow, title, autoDismiss = false, showSki
       <div className="absolute inset-0 bg-[linear-gradient(90deg,rgba(255,31,48,0.16),transparent_36%,rgba(0,190,255,0.12))]" />
       <div className="absolute inset-0 cyber-grid opacity-[0.18]" />
       <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-ink via-ink/82 to-transparent" />
-      <div className="relative flex min-h-[125vh] flex-col justify-end gap-4 p-4 sm:flex-row sm:items-end sm:justify-between sm:p-8">
+      <div className="relative flex min-h-[125dvh] flex-col justify-end gap-4 p-4 sm:flex-row sm:items-end sm:justify-between sm:p-8">
         <div className="max-w-xl pb-2 sm:pb-4">
           <p className="font-mono text-xs uppercase text-mint">{eyebrow}</p>
           {title && <p className="mt-2 text-xl font-black leading-tight text-white sm:text-2xl md:text-4xl">{title}</p>}

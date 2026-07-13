@@ -69,6 +69,7 @@ export function PortfolioBootLoader({ autoDismiss = false, duration = 1850 }: Po
 
   return (
     <div
+      data-testid="portfolio-loader"
       className="fixed inset-0 z-[100] overflow-hidden bg-ink bg-cover bg-center px-4 text-white"
       style={{ backgroundImage: "linear-gradient(180deg, rgba(3,6,5,0.20), rgba(3,6,5,0.96)), url('/images/operator-cockpit.jpeg')" }}
     >
