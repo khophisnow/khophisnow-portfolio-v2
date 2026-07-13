@@ -128,17 +128,17 @@ export const cases = [
     role: "Product Engineer",
     year: "2026",
     status: "Offline-first / online-room ready",
-    brief: "An offline-first, customizable Truth and Dare platform built with Next.js. Players can create local game rooms, upload custom question packs in JSON, CSV, or TXT, manage turn order, and play through a fair no-repeat randomization engine with persistent sessions and export/import support.",
-    impact: ["3 gameplay modes", "multi-format imports", "persistent local sessions", "invite-link-ready state"],
+    brief: "An offline-first, customizable Truth and Dare platform built with Next.js. Players can create local game rooms or Supabase-powered online rooms, upload custom question packs in JSON, CSV, or TXT, manage turn order, and play through a fair no-repeat randomization engine with synced dare timers, persistent sessions, and export/import support.",
+    impact: ["3 gameplay modes", "online invite rooms", "synced dare timer", "multi-format imports"],
     stack: ["Next.js", "TypeScript", "Tailwind CSS", "React state", "LocalStorage", "Supabase Realtime", "Playwright"],
     links: [{ label: "Live demo", href: "/truth-or-dare" }],
     modules: ["Room Manager", "Online Room Sync", "Player Manager", "Question Pack Importer", "Parser", "Randomization Engine", "Game Modes", "Scoring", "Timer", "History", "Export / Import", "Invite Links"],
     architecture: [
-      "Game rooms are represented as serializable local state with deterministic room identifiers.",
+      "Game rooms are represented as serializable state that can run locally or sync through an online invite room.",
       "Player order is fully configurable and cycles automatically until the session ends.",
       "Question packs are validated and parsed from JSON, CSV, or TXT before entering gameplay.",
       "The randomization engine prevents repeated questions and only resets exhausted pools.",
-      "Game progress, scores, history, and configuration persist locally through localStorage.",
+      "Game progress, scores, history, timer state, and configuration persist locally and can be mirrored to Supabase for online rooms.",
       "Online room state can sync through Supabase Realtime while local mode remains available when no backend is configured.",
     ],
     threatModel: [
@@ -147,7 +147,7 @@ export const cases = [
       { risk: "Repetitive gameplay", control: "No-repeat randomization with used-question tracking, per-player balance, and pool reset logic", lesson: "Randomness requires product rules to deliver a fair and engaging user experience." },
       { risk: "Online room drift", control: "Serializable room snapshots, Supabase Realtime updates, and local fallback mode", lesson: "Realtime features need a single room state shape that every client can safely replay." },
     ],
-    mock: ["room:create(local)", "players:add(reorder)", "pack:import(json|csv|txt)", "question:draw(no-repeat)", "game:advanceTurn()", "session:save(local)", "session:export()", "invite:create()"],
+    mock: ["room:create(local|online)", "room:join(invite)", "players:add(reorder)", "pack:import(json|csv|txt)", "question:draw(no-repeat)", "timer:sync(dare)", "game:advanceTurn()", "session:save(local)", "session:export()"],
   },
 ] as const;
 
@@ -269,7 +269,7 @@ export const mediaAssets = [
   { title: "EduManage demo", type: "Live project + screenshot", src: "/images/edumanage-demo.webp", project: "EduManage", liveUrl: "https://edumanage-demo.vercel.app" },
   { title: "WhatsUpUCC live app", type: "Live project + screenshot", src: "/images/whats-up-ucc.webp", project: "WhatsUpUCC", liveUrl: "https://whats-up-ucc.vercel.app" },
   { title: "WhatsUpUCC API docs", type: "Saved API docs screen", src: "/images/whats-up-ucc-api-docs.webp", project: "WhatsUpUCC" },
-  { title: "DareDeck game", type: "Local-first product", src: "/images/truth-or-dare.png", project: "DareDeck", liveUrl: "/truth-or-dare" },
+  { title: "DareDeck game", type: "Online room product", src: "/images/truth-or-dare.png", project: "DareDeck", liveUrl: "/truth-or-dare" },
   { title: "ACC/UCC citation", type: "Certificate / recognition", src: "/images/citationFromACC-UCC.jpeg", project: "Leadership" },
 ];
 

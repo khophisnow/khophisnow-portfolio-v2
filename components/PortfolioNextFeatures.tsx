@@ -31,7 +31,7 @@ export function TruthOrDareSpotlight() {
             <p className="font-mono text-sm uppercase">Playable portfolio build</p>
           </div>
           <h2 className="mt-5 text-4xl font-black leading-tight text-white md:text-5xl">DareDeck, built as a local-first product with online rooms.</h2>
-          <p className="mt-5 text-sm leading-7 text-white/64">This project turns a simple party idea into a product-grade web app: session setup, player order, custom packs, scoring rules, history, export/import, and optional Supabase-powered online room sync.</p>
+          <p className="mt-5 text-sm leading-7 text-white/64">This project turns a simple party idea into a product-grade web app: session setup, player order, custom packs, scoring rules, history, export/import, synced dare timers, and optional Supabase-powered online room sync.</p>
           <div className="mt-7 flex flex-wrap gap-3">
             <Link href="/truth-or-dare" className="inline-flex items-center gap-2 bg-mint px-5 py-3 font-bold text-ink hover:bg-white">Play the game<ArrowUpRight size={17} /></Link>
             <Link href="/case-files/truth-or-dare" className="inline-flex items-center gap-2 border border-white/18 px-5 py-3 font-bold text-white hover:border-cyan hover:text-cyan">Read case file</Link>
