@@ -10,7 +10,6 @@ import {
   FileJson,
   History,
   Import,
-  Moon,
   PartyPopper,
   Play,
   Plus,
@@ -28,7 +27,6 @@ import {
 type QuestionType = "truth" | "dare";
 type GameMode = "classic" | "random" | "challenge";
 type Stage = "landing" | "setup" | "play" | "finish";
-type Theme = "dark" | "light";
 type Result = "completed" | "skipped" | "failed";
 
 type Player = { id: string; name: string; score: number; completed: number; skipped: number; failed: number };
@@ -51,7 +49,6 @@ type GameState = {
   lastAutoType: QuestionType;
   history: Turn[];
   sound: boolean;
-  theme: Theme;
 };
 
 const storageKey = "khophi-truth-or-dare:v1";
@@ -96,7 +93,6 @@ function createInitialState(): GameState {
     lastAutoType: "dare",
     history: [],
     sound: false,
-    theme: "dark",
   };
 }
 
@@ -314,13 +310,12 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
   const resetAll = () => setState({ ...createInitialState(), roomId: id("room"), players: [createPlayer("KhophiSnow"), createPlayer("Guest")] });
 
   return (
-    <main ref={appRef} data-testid="truth-dare-app" data-hydrated="false" className={`scanline min-h-screen ${state.theme === "light" ? "bg-[#edf7f2] text-ink" : "bg-ink text-white"}`}>
+    <main ref={appRef} data-testid="truth-dare-app" data-hydrated="false" className="scanline min-h-screen bg-ink text-white">
       <div className="cyber-grid pointer-events-none absolute inset-x-0 top-0 h-[720px]" />
       <header className="relative z-10 border-b border-white/10 bg-ink/88 text-white backdrop-blur-xl">
         <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-4 lg:px-8">
           <Link href="/#case-files" className="inline-flex items-center gap-2 text-sm font-bold text-mint hover:text-white"><ArrowLeft size={16} />Back to case files</Link>
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => update({ theme: state.theme === "dark" ? "light" : "dark" })} className="border border-white/12 px-3 py-2 text-xs font-bold text-white/70 hover:border-mint hover:text-mint"><Moon className="mr-2 inline" size={14} />Theme</button>
             <button type="button" onClick={() => update({ sound: !state.sound })} className="border border-white/12 px-3 py-2 text-xs font-bold text-white/70 hover:border-mint hover:text-mint">{state.sound ? <Volume2 className="mr-2 inline" size={14} /> : <VolumeX className="mr-2 inline" size={14} />}Sound</button>
           </div>
         </nav>
