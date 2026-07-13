@@ -1,0 +1,382 @@
+ROLE:
+
+You are a Senior Full-Stack Engineer, Product Designer, UX Engineer, and Software Architect with expertise in building production-quality Next.js applications, interactive games, offline-first web applications, and portfolio-grade software projects.
+
+Your task is to design and implement a complete Truth & Dare multiplayer web application that is polished enough to be showcased as a professional portfolio project.
+
+CONTEXT:
+
+I am building this project as part of my developer portfolio.
+
+My existing portfolio uses Next.js, so this application must follow the same technology stack and design language as my portfolio website.
+
+The goal is to create a modern Truth & Dare platform where users can:
+
+- Create a game session
+- Add multiple players
+- Upload custom Truth and Dare question packs
+- Play locally without requiring an account
+- Support future multiplayer functionality through invite links
+- Have smooth animations and a premium user experience
+
+This should not feel like a basic random question generator. It should feel like a complete interactive game product.
+
+PROJECT REQUIREMENTS:
+
+Build a complete responsive web application with:
+
+Frontend:
+- Next.js (App Router)
+- TypeScript
+- Tailwind CSS
+- Framer Motion animations
+- Modern reusable component architecture
+
+State management:
+- Zustand or an equivalent lightweight state solution
+
+Storage:
+- LocalStorage for persistence
+- IndexedDB if needed for larger question packs
+- No database
+- No authentication system
+
+The application must work:
+- Online when deployed
+- Locally through localhost
+- Offline-friendly where possible
+
+
+CORE FEATURES:
+
+1. GAME CREATION
+
+Users should be able to:
+
+- Create a new game
+- Enter game name
+- Add 2 or more players
+- Assign player names
+- Remove players
+- Reorder players before starting
+
+Example:
+
+Players:
+
+1. Julius
+2. John
+3. Mary
+
+Game order:
+
+Julius → John → Mary → restart Julius
+
+
+2. QUESTION MANAGEMENT SYSTEM
+
+The application must support importing custom questions.
+
+Supported formats:
+
+- CSV
+- TXT
+- JSON
+
+Provide templates/examples for each format.
+
+Example JSON:
+
+{
+  "truths": [
+    "What is your biggest fear?",
+    "Who was your first crush?"
+  ],
+  "dares": [
+    "Sing for 30 seconds",
+    "Do 20 jumping jacks"
+  ]
+}
+
+
+CSV example:
+
+Type,Question
+Truth,What is your biggest fear?
+Dare,Sing for 30 seconds
+
+
+TXT example:
+
+TRUTH:
+What is your biggest fear?
+
+DARE:
+Sing for 30 seconds
+
+
+Users should also have:
+
+- Default built-in questions
+- Upload custom question packs
+- Preview imported questions
+- Validate incorrect formats
+- Delete uploaded packs
+
+
+3. GAME FLOW
+
+Implement this flow:
+
+START GAME
+
+↓
+
+Add Players
+
+↓
+
+Upload or select questions
+
+↓
+
+Choose game mode
+
+↓
+
+Game starts
+
+↓
+
+Current player's turn appears
+
+↓
+
+Player chooses:
+
+Truth
+or
+Dare
+
+↓
+
+Random question appears
+
+↓
+
+Player completes challenge
+
+↓
+
+Mark result:
+
+Completed
+Skipped
+Failed
+
+↓
+
+Update score
+
+↓
+
+Move automatically to next player
+
+↓
+
+Continue until game ends
+
+
+4. RANDOMIZATION SYSTEM
+
+Create a professional random question engine:
+
+Requirements:
+
+- Random truth/dare selection
+- Prevent repeating questions
+- Track used questions
+- Reset when all questions are completed
+- Balance truth and dare frequency
+
+
+5. SCORING SYSTEM
+
+Design a simple but professional scoring system.
+
+Truth:
+
+Completed truth:
++5 points
+
+Skipped truth:
+-2 points
+
+
+Dare:
+
+Completed dare:
++10 points
+
+Skipped dare:
+-5 points
+
+
+Failed dare:
+0 points
+
+
+Include:
+
+- Live scoreboard
+- Player ranking
+- Final winner screen
+
+
+6. GAME MODES
+
+Create:
+
+Classic Mode:
+
+Players manually select Truth or Dare.
+
+
+Random Mode:
+
+The system randomly chooses Truth or Dare.
+
+
+Challenge Mode:
+
+Higher difficulty dares give more points.
+
+
+7. MULTIPLAYER PREPARATION
+
+No accounts.
+
+No database.
+
+Design the architecture so multiplayer can be added later.
+
+Implement:
+
+- Shareable game invite link structure
+- Unique room ID generation
+- Game state serialization
+
+For now:
+- Local multiplayer using one device should work perfectly.
+
+
+8. UI/UX DESIGN
+
+Follow my portfolio website's design style.
+
+Requirements:
+
+- Premium developer portfolio feeling
+- Modern dark theme
+- Smooth transitions
+- Glassmorphism where appropriate
+- Professional typography
+- Responsive mobile-first design
+
+The application should look like:
+
+A modern SaaS product mixed with a party game.
+
+
+Include:
+
+Landing page:
+
+- Hero section
+- Description
+- Start Game button
+- Features section
+- How it works
+
+
+Game dashboard:
+
+- Current player
+- Player list
+- Scoreboard
+- Question card
+- Controls
+
+
+Animations:
+
+- Card reveal animation
+- Player transition animation
+- Score update animation
+- Winner celebration animation
+
+
+9. EXTRA PROFESSIONAL FEATURES
+
+Add:
+
+- Dark/light theme support
+- Sound effects toggle
+- Timer for timed dares
+- Skip question button
+- Confetti celebration
+- Game history stored locally
+- Export/import game sessions
+- PWA support if possible
+
+
+10. CODE QUALITY
+
+Follow professional engineering practices:
+
+- Clean folder structure
+- Reusable components
+- Strong TypeScript typing
+- Proper error handling
+- Accessible UI
+- Mobile responsive design
+- Maintainable architecture
+
+Avoid:
+
+- Hardcoded data everywhere
+- Poor component organization
+- Duplicate logic
+
+
+DELIVERABLE FORMAT:
+
+First provide:
+
+1. Complete project architecture
+2. Technology decisions explanation
+3. Database/storage approach explanation
+4. User flow diagram
+5. Component breakdown
+
+
+Then implement:
+
+- Full Next.js application
+- All required components
+- Styling
+- State management
+- Question import system
+- Game engine logic
+- Animations
+
+
+After implementation provide:
+
+1. How to run locally
+2. How to deploy
+3. Future improvements roadmap
+4. Portfolio description explaining the technical achievements
+
+
+The final result should be a polished, production-quality portfolio project, not a simple demo.

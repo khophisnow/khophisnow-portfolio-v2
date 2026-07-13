@@ -12,7 +12,7 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 | Accessibility | 7 | Good | Focus styles, skip link, semantic metadata, labels, and reduced-motion handling exist. A screen-reader and keyboard pass is still needed. |
 | SEO | 8 | Strong | Metadata, canonical URLs, Open Graph, sitemap, robots, and structured data are implemented. Future work: richer page-specific copy and image metadata. |
 | Security | 8 | Strong | Security headers, contact validation, rate limiting, environment fallback behavior, and safer API handling are implemented. Future work: dependency/security scanning automation. |
-| Performance | 7 | Good | Loader behavior, asset checks, and unused large public assets were cleaned up. Future work: video compression, font strategy, and Lighthouse-based thresholds. |
+| Performance | 8 | Strong | Loader behavior, asset checks, unused large asset cleanup, and enforceable media performance budgets are in place. Future work: video compression and Lighthouse-based UX metrics. |
 | Code Quality | 8 | Strong | Lint/build pass and audit scripts are available. Future work: component-level tests and reducing very large component files. |
 | Maintainability | 8 | Strong | Shared data modules and audit scripts help keep changes organized. Future work: split long page sections into smaller feature modules. |
 | Scalability | 7 | Good | Static-first public site is reliable. Content management is still manual until a CMS/admin phase is introduced. |
@@ -23,7 +23,7 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 | Testing | 7 | Good | Playwright browser smoke tests now cover key desktop/mobile routes, source-aware navigation, WaskiZone service flow, contact mail links, and visible overflow checks. |
 | Product Quality | 8 | Strong | Portfolio and WaskiZone now tell a clearer story. Future work: more proof, testimonials, project media, and tighter conversion copy. |
 
-**Overall score:** 7.8 / 10
+**Overall score:** 8.0 / 10
 
 ## Completed From The Audit Prompt
 
@@ -40,6 +40,7 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 - Playwright browser smoke tests added for desktop and mobile routes.
 - GitHub Actions quality gate now runs audits and browser smoke tests.
 - Next.js and PostCSS patched to resolve npm audit findings.
+- Performance budget audit added for referenced media, video totals, oversized images, and unused large public assets.
 
 ## Remaining High-Value Work
 
@@ -47,7 +48,7 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 
 | Problem | Why It Matters | Recommended Solution | Effort |
 | --- | --- | --- | --- |
-| No Lighthouse budget | Performance can slowly regress with videos and images. | Add Lighthouse/Pagespeed targets or a manual release checklist with asset budgets. | Medium |
+| No Lighthouse field metrics | Lab and field performance can still drift beyond simple asset budgets. | Add Lighthouse or Vercel Speed Insights review targets after the media budget is stable. | Medium |
 | Large video reliance | Videos create strong identity but can hurt first-load experience. | Compress videos, add mobile-specific variants, and set size budgets. | Medium |
 | No visual regression checks | UI changes can break mobile spacing without failing build. | Add screenshot checkpoints for key routes. | Medium |
 
@@ -79,7 +80,7 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 - [x] Large public asset audit exists.
 - [x] Unused heavy screenshots removed.
 - [x] Add browser automation tests.
-- [ ] Add Lighthouse or performance budget checks.
+- [x] Add Lighthouse or performance budget checks.
 - [ ] Compress and/or create mobile versions of loader videos.
 - [ ] Perform keyboard and screen-reader QA.
 - [ ] Add visual regression screenshots for key pages.

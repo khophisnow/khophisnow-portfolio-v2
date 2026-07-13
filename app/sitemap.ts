@@ -5,7 +5,7 @@ const siteUrl = "https://khophisnow.vercel.app";
 const lastModified = new Date("2026-07-08T00:00:00.000Z");
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const staticRoutes = ["", "/writeups", "/security-notes", "/waskizone", "/waskizone/contact", "/waskizone/policy", "/w4sk1z0n3", "/cert", "/certifications", "/dashboard", "/hack-lab"];
+  const staticRoutes = ["", "/writeups", "/truth-or-dare", "/security-notes", "/waskizone", "/waskizone/contact", "/waskizone/policy", "/w4sk1z0n3", "/cert", "/certifications", "/dashboard", "/hack-lab"];
   const projectRoutes = cases.map((project) => `/case-files/${project.slug}`);
   const writeupRoutes = writeupPosts.map((writeup) => `/writeups/${writeup.slug}`);
   const serviceRoutes = waskiServiceDetails.map((service) => `/waskizone/services/${service.slug}`);

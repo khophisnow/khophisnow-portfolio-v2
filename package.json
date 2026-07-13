@@ -11,9 +11,10 @@
     "github:feed": "node scripts/update-github-feed.mjs",
     "audit:live": "node scripts/audit-live.mjs",
     "audit:assets": "node scripts/audit-assets.mjs",
-    "audit:all": "npm run lint && npm run audit:static && npm run audit:assets && npm run audit:security && npm run build",
+    "audit:all": "npm run lint && npm run audit:static && npm run audit:assets && npm run audit:performance && npm run audit:security && npm run build",
     "audit:security": "npm audit --audit-level=moderate",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "audit:performance": "node scripts/audit-performance.mjs"
   },
   "dependencies": {
     "@mdx-js/loader": "^3.1.1",

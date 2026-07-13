@@ -7,14 +7,14 @@ export default defineConfig({
   fullyParallel: true,
   reporter: process.env.CI ? "github" : "list",
   use: {
-    baseURL: "http://127.0.0.1:3000",
+    baseURL: "http://127.0.0.1:3010",
     trace: "retain-on-failure",
     video: "retain-on-failure",
   },
   webServer: {
-    command: "npm run build && npm run start -- --hostname 127.0.0.1",
-    url: "http://127.0.0.1:3000",
-    reuseExistingServer: !process.env.CI,
+    command: "npm run build && npm run start -- --hostname 127.0.0.1 --port 3010",
+    url: "http://127.0.0.1:3010",
+    reuseExistingServer: false,
     timeout: 180_000,
   },
   projects: [

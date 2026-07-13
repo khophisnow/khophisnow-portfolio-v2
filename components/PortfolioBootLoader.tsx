@@ -47,8 +47,12 @@ type PortfolioBootLoaderProps = {
   duration?: number;
 };
 
+function shouldSkipLoader() {
+  return typeof window !== "undefined" && Boolean((window as typeof window & { __KHOPHISNOW_E2E__?: boolean }).__KHOPHISNOW_E2E__);
+}
+
 export function PortfolioBootLoader({ autoDismiss = false, duration = 1850 }: PortfolioBootLoaderProps) {
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(() => !shouldSkipLoader());
   const [sequence, setSequence] = useState<(typeof bootSequences)[number] | null>(null);
 
   useEffect(() => {

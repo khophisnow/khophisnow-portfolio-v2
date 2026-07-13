@@ -13,9 +13,11 @@ function SectionTitle({ eyebrow, title }: { eyebrow: string; title: string }) {
 export function ProjectWalkthroughs() {
   const [active, setActive] = useState(0);
   const project = cases[active];
-  const flow = project.name === "EduManage"
+  const flow = project.slug === "edumanage"
     ? ["Tenant context", "Identity check", "Role resolution", "Module action", "Operational proof"]
-    : ["Campus action", "API boundary", "Feature workflow", "Moderation path", "Public proof"];
+    : project.slug === "truth-or-dare"
+      ? ["Room setup", "Player order", "Pack validation", "Question draw", "Score history"]
+      : ["Campus action", "API boundary", "Feature workflow", "Moderation path", "Public proof"];
   const details = project.architecture.slice(0, 5);
 
   return (
@@ -66,11 +68,11 @@ export function ArchitectureFlowMaps() {
   const [active, setActive] = useState(0);
   const project = cases[active];
   const checkpoints = [
-    { label: "Client", detail: project.name === "EduManage" ? "School user opens a role-based workflow" : "Campus user opens a public feature", icon: Network },
+    { label: "Client", detail: project.slug === "edumanage" ? "School user opens a role-based workflow" : project.slug === "truth-or-dare" ? "Players start a local room and choose a mode" : "Campus user opens a public feature", icon: Network },
     { label: "Gateway", detail: "Request enters the documented API boundary", icon: Route },
     { label: "Auth", detail: "Session, role, and scope are checked", icon: KeyRound },
     { label: "Modules", detail: project.modules.slice(0, 4).join(" / "), icon: Server },
-    { label: "Records", detail: "Queries stay inside the right user, school, event, or content boundary", icon: Database },
+    { label: "Records", detail: project.slug === "truth-or-dare" ? "Local state stores players, packs, history, and export data" : "Queries stay inside the right user, school, event, or content boundary", icon: Database },
     { label: "Proof", detail: "Response, logs, docs, and tests make the flow reviewable", icon: ShieldCheck },
   ];
 

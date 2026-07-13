@@ -19,9 +19,13 @@ type LoadingAtmosphereProps = {
   duration?: number;
 };
 
+function shouldSkipLoader() {
+  return typeof window !== "undefined" && Boolean((window as typeof window & { __KHOPHISNOW_E2E__?: boolean }).__KHOPHISNOW_E2E__);
+}
+
 export function LoadingAtmosphere({ eyebrow, title, autoDismiss = false, showSkip = false, duration = 5200 }: LoadingAtmosphereProps) {
   const [scene, setScene] = useState<(typeof scenes)[number] | null>(null);
-  const [visible, setVisible] = useState(true);
+  const [visible, setVisible] = useState(() => !shouldSkipLoader());
 
   useEffect(() => {
     const selectTimer = window.setTimeout(() => {

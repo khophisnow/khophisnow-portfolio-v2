@@ -120,6 +120,35 @@ export const cases = [
     ],
     mock: ["GET /events", "POST /media/upload", "PATCH /moderation/:id", "GET /notifications"],
   },
+
+  {
+    slug: "truth-or-dare",
+    code: "CASE-03",
+    name: "DareDeck",
+    role: "Product Engineer",
+    year: "2026",
+    status: "Offline-first / multiplayer-ready",
+    brief: "An offline-first, customizable Truth and Dare platform built with Next.js. Players can create local game rooms, upload custom question packs in JSON, CSV, or TXT, manage turn order, and play through a fair no-repeat randomization engine with persistent sessions and export/import support.",
+    impact: ["3 gameplay modes", "multi-format imports", "persistent local sessions", "invite-link-ready state"],
+    stack: ["Next.js", "TypeScript", "Tailwind CSS", "React state", "LocalStorage", "Playwright"],
+    links: [{ label: "Live demo", href: "/truth-or-dare" }],
+    modules: ["Room Manager", "Player Manager", "Question Pack Importer", "Parser", "Randomization Engine", "Game Modes", "Scoring", "Timer", "History", "Export / Import", "Invite Links"],
+    architecture: [
+      "Game rooms are represented as serializable local state with deterministic room identifiers.",
+      "Player order is fully configurable and cycles automatically until the session ends.",
+      "Question packs are validated and parsed from JSON, CSV, or TXT before entering gameplay.",
+      "The randomization engine prevents repeated questions and only resets exhausted pools.",
+      "Game progress, scores, history, and configuration persist locally through localStorage.",
+      "The state model is designed to support future real-time multiplayer synchronization without major refactoring.",
+    ],
+    threatModel: [
+      { risk: "Session loss", control: "Persistent localStorage, export/import, and automatic recovery", lesson: "Interactive applications should recover gracefully from accidental refreshes or browser closure." },
+      { risk: "Malformed question packs", control: "Strict validation, live preview, and minimum content requirements", lesson: "User-supplied content should be validated before becoming application state." },
+      { risk: "Repetitive gameplay", control: "No-repeat randomization with used-question tracking, per-player balance, and pool reset logic", lesson: "Randomness requires product rules to deliver a fair and engaging user experience." },
+      { risk: "Future multiplayer complexity", control: "Serializable room state and deterministic game flow prepared for synchronization", lesson: "Extensible state models reduce future architectural changes." },
+    ],
+    mock: ["room:create(local)", "players:add(reorder)", "pack:import(json|csv|txt)", "question:draw(no-repeat)", "game:advanceTurn()", "session:save(local)", "session:export()", "invite:create()"],
+  },
 ] as const;
 
 export const stack = [
@@ -201,6 +230,7 @@ export const downloads = [
   { label: "GitHub", href: "https://github.com/khophisnow", icon: Github },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/khophisnow", icon: Linkedin },
   { label: "WaskiZone Services", href: "/waskizone", icon: Code2 },
+  { label: "DareDeck", href: "/truth-or-dare", icon: Code2 },
   { label: "WhatsUpUCC API Docs", href: "https://whats-up-ucc-backend.onrender.com/api-docs/", icon: FileJson },
 ];
 
@@ -223,6 +253,7 @@ export const commandActions = [
   { label: "Download CV", href: "/cv/somuah-julius-software-developer-cv-2026.pdf", hint: "g v" },
   { label: "GitHub", href: "https://github.com/khophisnow", hint: "g h" },
   { label: "WaskiZone services", href: "/waskizone", hint: "g w" },
+  { label: "DareDeck game", href: "/truth-or-dare", hint: "g t" },
   { label: "Contact", href: "#contact", hint: "g c" },
 ];
 
@@ -238,6 +269,7 @@ export const mediaAssets = [
   { title: "EduManage demo", type: "Live project + screenshot", src: "/images/edumanage-demo.webp", project: "EduManage", liveUrl: "https://edumanage-demo.vercel.app" },
   { title: "WhatsUpUCC live app", type: "Live project + screenshot", src: "/images/whats-up-ucc.webp", project: "WhatsUpUCC", liveUrl: "https://whats-up-ucc.vercel.app" },
   { title: "WhatsUpUCC API docs", type: "Saved API docs screen", src: "/images/whats-up-ucc-api-docs.webp", project: "WhatsUpUCC" },
+  { title: "DareDeck game", type: "Local-first product", src: "/images/truth-or-dare.png", project: "DareDeck", liveUrl: "/truth-or-dare" },
   { title: "ACC/UCC citation", type: "Certificate / recognition", src: "/images/citationFromACC-UCC.jpeg", project: "Leadership" },
 ];
 

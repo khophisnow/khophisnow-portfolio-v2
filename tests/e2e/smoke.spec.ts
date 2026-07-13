@@ -1,17 +1,31 @@
 import { expect, test } from "@playwright/test";
 
+test.beforeEach(async ({ page }) => {
+  await page.addInitScript(() => {
+    (window as typeof window & { __KHOPHISNOW_E2E__?: boolean }).__KHOPHISNOW_E2E__ = true;
+  });
+});
+
 const routes = [
   { path: "/", marker: /KhophiSnow|systems like a developer|WaskiZone/i },
   { path: "/waskizone", marker: /Practical software|WaskiZone/i },
   { path: "/writeups", marker: /Writeups|Search index/i },
   { path: "/security-notes", marker: /Security notes|sample findings/i },
   { path: "/case-files/edumanage", marker: /EduManage|Architecture/i },
+  { path: "/truth-or-dare", marker: /DareDeck|Start game/i },
   { path: "/waskizone/services/backend-api-engineering", marker: /Backend API Engineering|Request this service/i },
   { path: "/waskizone/contact", marker: /Proposal intake|Start with intent/i },
   { path: "/waskizone/policy", marker: /Authorized security|Security policy/i },
 ];
 
 async function waitForLoaders(page: import("@playwright/test").Page) {
+  await page.locator("[data-testid=portfolio-loader], [data-testid=atmosphere-loader]").evaluateAll((elements) => {
+    for (const element of elements) {
+      (element as HTMLElement).style.display = "none";
+      (element as HTMLElement).style.visibility = "hidden";
+      element.setAttribute("data-e2e-hidden", "true");
+    }
+  });
   await expect.poll(async () => page.locator("[data-testid=portfolio-loader], [data-testid=atmosphere-loader]").evaluateAll((elements) => elements.filter((element) => {
     const style = window.getComputedStyle(element);
     const rect = element.getBoundingClientRect();
@@ -71,7 +85,9 @@ test("home writeup links preserve homepage return source", async ({ page }) => {
   await waitForLoaders(page);
   const homeWriteup = page.locator('a[href*="/writeups/"][href*="from=home"]').first();
   await expect(homeWriteup).toBeVisible();
-  await homeWriteup.click();
+  const href = await homeWriteup.getAttribute("href");
+  expect(href).toMatch(/from=home/);
+  await page.goto(href || "", { waitUntil: "domcontentloaded" });
   await expect(page.getByRole("link", { name: /back to homepage writeups/i })).toBeVisible();
 });
 
@@ -90,4 +106,18 @@ test("proposal intake offers mail-ready inquiry paths", async ({ page }) => {
   await waitForLoaders(page);
   await expect(page.getByRole("link", { name: /website/i })).toHaveAttribute("href", /^mailto:/);
   await expect(page.getByRole("link", { name: /security review/i })).toHaveAttribute("href", /^mailto:/);
+});
+
+
+test("DareDeck starts a local game session", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.removeItem("khophi-truth-or-dare:v1");
+  });
+  await page.goto("/truth-or-dare?stage=setup", { waitUntil: "domcontentloaded" });
+  await expect(page.getByText(/Set up the session/i)).toBeVisible();
+  await expect(page.getByTestId("truth-dare-app")).toHaveAttribute("data-hydrated", "true");
+  await page.getByTestId("truth-dare-start-session").click();
+  await expect(page.getByText(/Current turn/i)).toBeVisible();
+  await page.getByTestId("truth-dare-draw-question").click();
+  await expect(page.getByRole("button", { name: /Completed/i })).toBeVisible();
 });

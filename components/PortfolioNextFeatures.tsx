@@ -3,17 +3,67 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo, useState } from "react";
-import { ArrowUpRight, MonitorPlay } from "lucide-react";
+import { ArrowUpRight, Gamepad2, MonitorPlay, Sparkles } from "lucide-react";
 import { cases, securityNotes } from "@/lib/portfolio-data";
 
 function SectionTitle({ eyebrow, title }: { eyebrow: string; title: string }) {
   return <div><p className="font-mono text-sm uppercase text-mint">{eyebrow}</p><h2 className="mt-3 max-w-3xl text-3xl font-black leading-tight text-white md:text-5xl">{title}</h2></div>;
 }
 
+
+export function TruthOrDareSpotlight() {
+  const game = cases.find((project) => project.slug === "truth-or-dare");
+  if (!game) return null;
+
+  const signals = [
+    { label: "Local-first", value: "No accounts or database required" },
+    { label: "Custom packs", value: "JSON, CSV, and TXT imports" },
+    { label: "Fair engine", value: "No-repeat draws and per-player balance" },
+    { label: "Portable state", value: "Room ID, export, import, and future invite flow" },
+  ];
+
+  return (
+    <section className="border-y border-white/10 bg-[radial-gradient(circle_at_72%_18%,rgba(0,220,255,0.08),transparent_36%),rgba(255,255,255,0.025)]">
+      <div className="mx-auto grid max-w-7xl gap-8 px-5 py-20 lg:grid-cols-[0.92fr_1.08fr] lg:px-8">
+        <div className="border border-mint/20 bg-panel/78 p-6 shadow-terminal">
+          <div className="flex items-center gap-3 text-mint">
+            <Gamepad2 size={26} />
+            <p className="font-mono text-sm uppercase">Playable portfolio build</p>
+          </div>
+          <h2 className="mt-5 text-4xl font-black leading-tight text-white md:text-5xl">DareDeck, built as a complete local-first product.</h2>
+          <p className="mt-5 text-sm leading-7 text-white/64">This project turns a simple party idea into a product-grade web app: session setup, player order, custom packs, scoring rules, history, export/import, and a structure ready for multiplayer later.</p>
+          <div className="mt-7 flex flex-wrap gap-3">
+            <Link href="/truth-or-dare" className="inline-flex items-center gap-2 bg-mint px-5 py-3 font-bold text-ink hover:bg-white">Play the game<ArrowUpRight size={17} /></Link>
+            <Link href="/case-files/truth-or-dare" className="inline-flex items-center gap-2 border border-white/18 px-5 py-3 font-bold text-white hover:border-cyan hover:text-cyan">Read case file</Link>
+          </div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div className="overflow-hidden border border-white/10 bg-black/35 sm:col-span-2">
+            <Image src="/images/truth-or-dare.png" alt="DareDeck interface preview" width={1364} height={646} className="aspect-video w-full object-cover object-top" />
+          </div>
+          {signals.map((signal) => (
+            <article key={signal.label} className="border border-white/10 bg-black/24 p-5">
+              <Sparkles className="text-cyan" size={19} />
+              <h3 className="mt-4 text-xl font-black text-white">{signal.label}</h3>
+              <p className="mt-3 text-sm leading-6 text-white/58">{signal.value}</p>
+            </article>
+          ))}
+          <article className="border border-cyan/25 bg-cyan/10 p-5 sm:col-span-2">
+            <p className="font-mono text-xs uppercase text-cyan">Product architecture</p>
+            <div className="mt-4 grid gap-2 sm:grid-cols-4">
+              {["Room", "Packs", "Random engine", "Session export"].map((item, index) => <span key={item} className="border border-white/10 bg-ink/70 px-3 py-3 font-mono text-xs text-white/70">0{index + 1} / {item}</span>)}
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 export function MobileProjectStoryMode() {
   const [active, setActive] = useState(0);
   const project = cases[active];
-  const story = project.name === "EduManage"
+  const story = project.slug === "edumanage"
     ? [
       { title: "A school user signs in", detail: "The system starts with identity, session handling, and a school-aware user context." },
       { title: "Role boundaries load", detail: "Permissions decide what the person can view, change, approve, or report." },
@@ -21,13 +71,21 @@ export function MobileProjectStoryMode() {
       { title: "The database stays scoped", detail: "Queries should respect tenant context so one school cannot read another school&apos;s records." },
       { title: "Evidence is reviewable", detail: "Swagger, tests, health checks, and seed data make the backend easier to inspect and integrate." },
     ]
-    : [
-      { title: "A campus user opens a feature", detail: "Events, media, comments, bookmarks, and notifications begin as simple user actions." },
-      { title: "The API boundary checks the request", detail: "JWT, CORS, rate limiting, request tracking, and validation protect public-facing routes." },
-      { title: "Community modules respond", detail: "Events, media, moderation, admin, audit, and health modules keep the platform maintainable." },
-      { title: "Moderation keeps it safer", detail: "Public content needs workflows for review, abuse control, and admin decisions." },
-      { title: "Docs support integration", detail: "OpenAPI docs make the project understandable beyond the original developer." },
-    ];
+    : project.slug === "truth-or-dare"
+      ? [
+        { title: "A room starts locally", detail: "The game creates a room ID and keeps everything playable without accounts or a database." },
+        { title: "Players set the order", detail: "Names can be added, removed, and reordered before the first turn starts." },
+        { title: "Packs are validated", detail: "JSON, CSV, and TXT uploads are previewed before they become active questions." },
+        { title: "The engine draws fairly", detail: "Truth and dare pools avoid repeats and reset only after the active pool is exhausted." },
+        { title: "The session is portable", detail: "Scores, history, packs, and room state can be exported for future multiplayer expansion." },
+      ]
+      : [
+        { title: "A campus user opens a feature", detail: "Events, media, comments, bookmarks, and notifications begin as simple user actions." },
+        { title: "The API boundary checks the request", detail: "JWT, CORS, rate limiting, request tracking, and validation protect public-facing routes." },
+        { title: "Community modules respond", detail: "Events, media, moderation, admin, audit, and health modules keep the platform maintainable." },
+        { title: "Moderation keeps it safer", detail: "Public content needs workflows for review, abuse control, and admin decisions." },
+        { title: "Docs support integration", detail: "OpenAPI docs make the project understandable beyond the original developer." },
+      ];
 
   return (
     <section className="border-y border-white/10 bg-white/[0.025]">
@@ -56,7 +114,7 @@ export function DemoPreviewStrip() {
   const previews = [
     { project: "EduManage", src: "/images/edumanage-demo.webp", label: "multi-tenant school workflow", href: "/case-files/edumanage" },
     { project: "WhatsUpUCC", src: "/images/whats-up-ucc.webp", label: "campus event and media flow", href: "/case-files/whatsupucc" },
-    { project: "API docs", src: "/images/whats-up-ucc-api-docs.webp", label: "documented backend surface", href: "/case-files/whatsupucc" },
+    { project: "DareDeck", src: "/images/truth-or-dare.png", label: "local-first game product", href: "/truth-or-dare" },
   ];
   return (
     <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
