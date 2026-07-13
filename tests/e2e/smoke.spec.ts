@@ -121,3 +121,16 @@ test("DareDeck starts a local game session", async ({ page }) => {
   await page.getByTestId("truth-dare-draw-question").click();
   await expect(page.getByRole("button", { name: /Completed/i })).toBeVisible();
 });
+
+
+test("DareDeck lets the group fail a truth and deducts points", async ({ page }) => {
+  await page.addInitScript(() => {
+    window.localStorage.removeItem("khophi-truth-or-dare:v1");
+  });
+  await page.goto("/truth-or-dare?stage=setup", { waitUntil: "domcontentloaded" });
+  await page.getByTestId("truth-dare-start-session").click();
+  await page.getByRole("button", { name: /^Truth$/ }).click();
+  await expect(page.getByText(/Result decided by the group/i)).toBeVisible();
+  await page.getByRole("button", { name: /^Failed$/ }).click();
+  await expect(page.getByText(/KhophiSnow -5/i)).toBeVisible();
+});

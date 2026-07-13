@@ -53,6 +53,7 @@ type GameState = {
   timerRunning: boolean;
   timerDuration: number;
   timerEndsAt: string | null;
+  timerExpired: boolean;
 };
 
 type OnlineRoom = {
@@ -114,6 +115,7 @@ function createInitialState(): GameState {
     timerRunning: false,
     timerDuration: 0,
     timerEndsAt: null,
+    timerExpired: false,
   };
 }
 
@@ -125,11 +127,11 @@ function pointsFor(question: Question, result: Result, mode: GameMode) {
   if (question.type === "truth") {
     if (result === "completed") return 5;
     if (result === "skipped") return -2;
-    return 0;
+    return -5;
   }
   if (result === "completed") return mode === "challenge" && question.difficulty === "hard" ? 15 : 10;
   if (result === "skipped") return -5;
-  return 0;
+  return -10;
 }
 
 function parseImportedQuestions(raw: string, fileName = "Custom Pack"): Pack {
@@ -181,12 +183,18 @@ function sampleTemplate(type: "json" | "csv" | "txt") {
   return 'TRUTH:\nWhat is your biggest fear?\n\nDARE:\nSing for 30 seconds';
 }
 
-function createDareTimerPatch(seconds = 30): Pick<GameState, "timerRunning" | "timerDuration" | "timerEndsAt"> {
-  return { timerRunning: true, timerDuration: seconds, timerEndsAt: new Date(Date.now() + seconds * 1000).toISOString() };
+type TimerPatch = Pick<GameState, "timerRunning" | "timerDuration" | "timerEndsAt" | "timerExpired">;
+
+function createDareTimerPatch(seconds = 30): TimerPatch {
+  return { timerRunning: true, timerDuration: seconds, timerEndsAt: new Date(Date.now() + seconds * 1000).toISOString(), timerExpired: false };
 }
 
-function clearTimerPatch(): Pick<GameState, "timerRunning" | "timerDuration" | "timerEndsAt"> {
-  return { timerRunning: false, timerDuration: 0, timerEndsAt: null };
+function clearTimerPatch(): TimerPatch {
+  return { timerRunning: false, timerDuration: 0, timerEndsAt: null, timerExpired: false };
+}
+
+function expireTimerPatch(): TimerPatch {
+  return { timerRunning: false, timerDuration: 0, timerEndsAt: null, timerExpired: true };
 }
 
 function timerRemainingSeconds(state: GameState, now: number) {
@@ -254,7 +262,7 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
   const rankings = [...state.players].sort((a, b) => b.score - a.score);
   const timerRemaining = timerRemainingSeconds(state, now);
 
-  const queueOnlineSync = (nextState: GameState) => {
+  const queueOnlineSync = useCallback((nextState: GameState) => {
     const room = onlineRoomRef.current;
     if (!supabase || !room.enabled || applyingRemoteState.current) return;
     const payloadState = { ...nextState, roomId: room.roomId };
@@ -271,17 +279,28 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
       lastOnlineState.current = serialized;
       setOnlineRoom((value) => ({ ...value, status: "connected", error: "" }));
     }, 450);
-  };
+  }, [supabase]);
 
-  const commitState = (nextOrUpdater: GameState | ((value: GameState) => GameState)) => {
+  const commitState = useCallback((nextOrUpdater: GameState | ((value: GameState) => GameState)) => {
     setState((value) => {
       const next = typeof nextOrUpdater === "function" ? nextOrUpdater(value) : nextOrUpdater;
       queueOnlineSync(next);
       return next;
     });
-  };
+  }, [queueOnlineSync]);
 
-  const update = (patch: Partial<GameState>) => commitState((value) => ({ ...value, ...patch }));
+  const update = useCallback((patch: Partial<GameState>) => commitState((value) => ({ ...value, ...patch })), [commitState]);
+
+  useEffect(() => {
+    if (!state.timerRunning || !state.timerEndsAt || timerRemaining > 0 || state.currentQuestion?.type !== "dare") return;
+    const timeout = window.setTimeout(() => {
+      commitState((value) => {
+        if (!value.timerRunning || value.currentQuestion?.type !== "dare") return value;
+        return { ...value, ...expireTimerPatch() };
+      });
+    }, 0);
+    return () => window.clearTimeout(timeout);
+  }, [commitState, state.currentQuestion?.type, state.timerEndsAt, state.timerRunning, timerRemaining]);
   const playSound = () => {
     if (!state.sound || typeof window === "undefined") return;
     const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
@@ -367,7 +386,7 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
     setImportPreview(null);
   };
 
-  const exportSession = () => setSessionText(JSON.stringify({ ...state, stage: "setup", currentQuestion: null }, null, 2));
+  const exportSession = () => setSessionText(JSON.stringify({ ...state, stage: "setup", currentQuestion: null, ...clearTimerPatch() }, null, 2));
   const importSession = () => {
     try {
       const parsed = JSON.parse(sessionText) as GameState;
@@ -487,7 +506,7 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
 
       {state.stage === "landing" && <Landing onStart={() => update({ stage: "setup" })} />}
       {state.stage === "setup" && <Setup state={state} activeQuestions={activeQuestions} inviteUrl={inviteUrl} update={update} addPlayer={addPlayer} movePlayer={movePlayer} handlePackFile={handlePackFile} importError={importError} importPreview={importPreview} acceptPack={acceptPack} startGame={startGame} exportSession={exportSession} importSession={importSession} sessionText={sessionText} setSessionText={setSessionText} resetAll={resetAll} onlineRoom={onlineRoom} onlineAvailable={Boolean(supabase)} copyNotice={copyNotice} createOnlineRoom={createOnlineRoom} leaveOnlineRoom={leaveOnlineRoom} copyInviteLink={copyInviteLink} />}
-      {state.stage === "play" && <PlayStage state={state} currentPlayer={currentPlayer} rankings={rankings} activeQuestions={activeQuestions} chooseQuestion={chooseQuestion} markResult={markResult} timer={timerRemaining} timerRunning={state.timerRunning} toggleTimer={() => update(state.timerRunning ? { timerRunning: false, timerDuration: timerRemaining, timerEndsAt: null } : { timerRunning: true, timerDuration: timerRemaining || 30, timerEndsAt: new Date(Date.now() + (timerRemaining || 30) * 1000).toISOString() })} finish={() => update({ stage: "finish" })} />}
+      {state.stage === "play" && <PlayStage state={state} currentPlayer={currentPlayer} rankings={rankings} activeQuestions={activeQuestions} chooseQuestion={chooseQuestion} markResult={markResult} timer={timerRemaining} timerRunning={state.timerRunning} toggleTimer={() => update(state.timerRunning ? { timerRunning: false, timerDuration: timerRemaining, timerEndsAt: null, timerExpired: false } : { timerRunning: true, timerDuration: timerRemaining || 30, timerEndsAt: new Date(Date.now() + (timerRemaining || 30) * 1000).toISOString(), timerExpired: false })} finish={() => update({ stage: "finish" })} />}
       {state.stage === "finish" && <Finish rankings={rankings} restart={() => update({ stage: "setup", currentQuestion: null, currentPlayerIndex: 0, ...clearTimerPatch() })} resetAll={resetAll} />}
     </main>
   );
@@ -506,7 +525,7 @@ function Setup(props: { state: GameState; activeQuestions: Question[]; inviteUrl
 }
 
 function PlayStage({ state, currentPlayer, rankings, activeQuestions, chooseQuestion, markResult, timer, timerRunning, toggleTimer, finish }: { state: GameState; currentPlayer: Player; rankings: Player[]; activeQuestions: Question[]; chooseQuestion: (type?: QuestionType) => void; markResult: (result: Result) => void; timer: number; timerRunning: boolean; toggleTimer: () => void; finish: () => void }) {
-  return <section className="relative mx-auto max-w-7xl px-5 py-14 lg:px-8"><div className="flex flex-col justify-between gap-4 md:flex-row md:items-end"><SectionHeader eyebrow={state.mode} title={state.gameName} text={`${activeQuestions.length} active questions / ${state.history.length} turns played`} /><button type="button" onClick={finish} className="border border-amber/40 px-4 py-3 font-bold text-amber hover:bg-amber hover:text-ink">End game</button></div><div className="mt-10 grid gap-6 lg:grid-cols-[0.72fr_0.28fr]"><div className="panel-glow border border-mint/20 bg-panel/85 p-5"><p className="font-mono text-xs uppercase text-cyan">Current turn</p><h2 className="mt-3 text-4xl font-black text-white md:text-6xl">{currentPlayer?.name}</h2>{!state.currentQuestion ? <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3"><button type="button" onClick={() => chooseQuestion("truth")} disabled={state.mode !== "classic"} className="border border-cyan/30 bg-cyan/10 p-5 text-left font-black text-cyan disabled:opacity-35">Truth</button><button type="button" onClick={() => chooseQuestion("dare")} disabled={state.mode !== "classic"} className="border border-red-300/30 bg-red-500/10 p-5 text-left font-black text-red-200 disabled:opacity-35">Dare</button><button type="button" data-testid="truth-dare-draw-question" onClick={() => chooseQuestion()} className="col-span-2 border border-mint/35 bg-mint/10 p-5 text-left font-black text-mint sm:col-span-1"><Shuffle className="mb-3" />Draw question</button></div> : <div className="mt-8 animate-[route-enter_420ms_ease_both] border border-white/10 bg-black/35 p-6"><p className="font-mono text-xs uppercase text-mint">{state.currentQuestion.type}{state.currentQuestion.difficulty === "hard" ? " / hard" : ""}</p><p className="mt-4 text-3xl font-black leading-tight text-white">{state.currentQuestion.text}</p>{state.currentQuestion.type === "dare" && <div className="mt-6 flex flex-wrap items-center gap-3"><span className="inline-flex items-center gap-2 border border-white/10 px-4 py-3 font-mono text-xl text-amber"><Timer size={20} />{timer}s</span><button type="button" onClick={toggleTimer} className="border border-amber/35 px-4 py-3 font-bold text-amber hover:bg-amber hover:text-ink">{timerRunning ? "Pause" : "Start timer"}</button></div>}<div className="mt-8 grid gap-3 sm:grid-cols-3"><button type="button" onClick={() => markResult("completed")} className="bg-mint px-4 py-3 font-bold text-ink">Completed</button><button type="button" onClick={() => markResult("skipped")} className="border border-amber/35 px-4 py-3 font-bold text-amber hover:bg-amber hover:text-ink">Skipped</button><button type="button" onClick={() => markResult("failed")} disabled={state.currentQuestion.type === "truth"} className="border border-red-300/35 px-4 py-3 font-bold text-red-200 disabled:opacity-35">Failed dare</button></div></div>}</div><aside className="space-y-5"><Scoreboard rankings={rankings} /><Panel title="Turn history"><div className="max-h-80 space-y-3 overflow-auto pr-1">{state.history.slice(0, 8).map((turn) => <div key={turn.id} className="border border-white/10 bg-black/25 p-3 text-xs text-white/60"><p className="font-bold text-white">{turn.playerName} <span className={turn.points >= 0 ? "text-mint" : "text-red-200"}>{turn.points >= 0 ? "+" : ""}{turn.points}</span></p><p className="mt-1 capitalize text-cyan">{turn.type} / {turn.result}</p></div>)}</div></Panel></aside></div></section>;
+  return <section className="relative mx-auto max-w-7xl px-5 py-14 lg:px-8"><div className="flex flex-col justify-between gap-4 md:flex-row md:items-end"><SectionHeader eyebrow={state.mode} title={state.gameName} text={`${activeQuestions.length} active questions / ${state.history.length} turns played`} /><button type="button" onClick={finish} className="border border-amber/40 px-4 py-3 font-bold text-amber hover:bg-amber hover:text-ink">End game</button></div><div className="mt-10 grid gap-6 lg:grid-cols-[0.72fr_0.28fr]"><div className="panel-glow border border-mint/20 bg-panel/85 p-5"><p className="font-mono text-xs uppercase text-cyan">Current turn</p><h2 className="mt-3 text-4xl font-black text-white md:text-6xl">{currentPlayer?.name}</h2>{!state.currentQuestion ? <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3"><button type="button" onClick={() => chooseQuestion("truth")} disabled={state.mode !== "classic"} className="border border-cyan/30 bg-cyan/10 p-5 text-left font-black text-cyan disabled:opacity-35">Truth</button><button type="button" onClick={() => chooseQuestion("dare")} disabled={state.mode !== "classic"} className="border border-red-300/30 bg-red-500/10 p-5 text-left font-black text-red-200 disabled:opacity-35">Dare</button><button type="button" data-testid="truth-dare-draw-question" onClick={() => chooseQuestion()} className="col-span-2 border border-mint/35 bg-mint/10 p-5 text-left font-black text-mint sm:col-span-1"><Shuffle className="mb-3" />Draw question</button></div> : <div className="mt-8 animate-[route-enter_420ms_ease_both] border border-white/10 bg-black/35 p-6"><p className="font-mono text-xs uppercase text-mint">{state.currentQuestion.type}{state.currentQuestion.difficulty === "hard" ? " / hard" : ""}</p><p className="mt-4 text-3xl font-black leading-tight text-white">{state.currentQuestion.text}</p>{state.currentQuestion.type === "dare" && <div className="mt-6 flex flex-wrap items-center gap-3"><span className={`inline-flex items-center gap-2 border px-4 py-3 font-mono text-xl ${state.timerExpired ? "border-red-300/35 text-red-200" : "border-white/10 text-amber"}`}><Timer size={20} />{timer}s</span><button type="button" onClick={toggleTimer} className="border border-amber/35 px-4 py-3 font-bold text-amber hover:bg-amber hover:text-ink">{timerRunning ? "Pause" : state.timerExpired ? "Restart timer" : "Start timer"}</button>{state.timerExpired && <span className="border border-red-300/30 bg-red-500/10 px-4 py-3 text-sm font-bold text-red-100">Time up. The group should judge the result.</span>}</div>}<div className="mt-8 border border-white/10 bg-white/[0.03] p-4"><p className="font-mono text-xs uppercase text-white/45">Result decided by the group</p><div className="mt-3 grid gap-3 sm:grid-cols-3"><button type="button" onClick={() => markResult("completed")} className="bg-mint px-4 py-3 font-bold text-ink">Completed</button><button type="button" onClick={() => markResult("skipped")} className="border border-amber/35 px-4 py-3 font-bold text-amber hover:bg-amber hover:text-ink">Skipped</button><button type="button" onClick={() => markResult("failed")} className="border border-red-300/35 px-4 py-3 font-bold text-red-200 hover:bg-red-500/10">Failed</button></div></div></div>}</div><aside className="space-y-5"><Scoreboard rankings={rankings} /><Panel title="Turn history"><div className="max-h-80 space-y-3 overflow-auto pr-1">{state.history.slice(0, 8).map((turn) => <div key={turn.id} className="border border-white/10 bg-black/25 p-3 text-xs text-white/60"><p className="font-bold text-white">{turn.playerName} <span className={turn.points >= 0 ? "text-mint" : "text-red-200"}>{turn.points >= 0 ? "+" : ""}{turn.points}</span></p><p className="mt-1 capitalize text-cyan">{turn.type} / {turn.result}</p></div>)}</div></Panel></aside></div></section>;
 }
 
 function Finish({ rankings, restart, resetAll }: { rankings: Player[]; restart: () => void; resetAll: () => void }) {
