@@ -21,8 +21,6 @@ import {
   Trash2,
   Trophy,
   Upload,
-  Volume2,
-  VolumeX,
 } from "lucide-react";
 
 type QuestionType = "truth" | "dare";
@@ -49,7 +47,6 @@ type GameState = {
   usedDareIds: string[];
   lastAutoType: QuestionType;
   history: Turn[];
-  sound: boolean;
   timerRunning: boolean;
   timerDuration: number;
   timerEndsAt: string | null;
@@ -112,7 +109,6 @@ function createInitialState(): GameState {
     usedDareIds: [],
     lastAutoType: "dare",
     history: [],
-    sound: false,
     timerRunning: false,
     timerDuration: 0,
     timerEndsAt: null,
@@ -215,6 +211,25 @@ function defaultDevicePlayerId(players: Player[], role: OnlineRoom["role"]) {
   return (role === "guest" ? players[1]?.id : players[0]?.id) || players[0]?.id || "";
 }
 
+const dareDeckLoaderVideo = "/videos/daredeck/daredeck-loader.mp4#t=0,3";
+
+function shouldSkipDareDeckLoader() {
+  return typeof window !== "undefined" && Boolean((window as typeof window & { __KHOPHISNOW_E2E__?: boolean }).__KHOPHISNOW_E2E__);
+}
+
+function DareDeckLoader() {
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => setVisible(false), shouldSkipDareDeckLoader() ? 0 : 3000);
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  if (!visible) return null;
+
+  return <div data-testid="daredeck-loader" className="fixed left-0 top-0 z-[100] h-[125dvh] w-[125vw] overflow-hidden bg-ink text-white"><video src={dareDeckLoaderVideo} autoPlay muted playsInline preload="auto" className="absolute inset-0 h-full w-full object-cover object-center opacity-80 saturate-125 contrast-110" onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 2.95) setVisible(false); }} onEnded={() => setVisible(false)} /><div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(66,255,179,0.12),rgba(3,6,5,0.66)_58%,rgba(3,6,5,0.96))]" /><div className="absolute inset-0 cyber-grid opacity-[0.14]" /><div className="absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-ink via-ink/86 to-transparent" /><div className="relative flex min-h-[125dvh] flex-col justify-end gap-4 px-5 pb-16 pt-10 sm:flex-row sm:items-end sm:justify-between sm:px-8 sm:pb-14"><div className="max-w-xl"><p className="font-mono text-xs uppercase tracking-[0.22em] text-mint">Loading DareDeck</p><h1 className="mt-3 max-w-[14ch] text-3xl font-black leading-tight text-white sm:max-w-none sm:text-5xl">Truth. Dare. Sync.</h1><p className="mt-3 max-w-md text-sm leading-6 text-white/62">Preparing cards, room state, timer, and fair judging.</p></div><button type="button" onClick={() => setVisible(false)} className="w-fit shrink-0 border border-white/18 bg-ink/55 px-4 py-3 text-xs font-bold text-white/70 backdrop-blur-md hover:border-mint hover:text-mint">Skip</button></div></div>;
+}
+
 export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: Stage } = {}) {
   const [state, setState] = useState<GameState>(() => ({ ...createInitialState(), stage: initialStage }));
   const [importError, setImportError] = useState("");
@@ -231,7 +246,6 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
   const applyingRemoteState = useRef(false);
   const onlineSyncTimer = useRef<number | null>(null);
   const lastOnlineState = useRef("");
-  const ambienceRef = useRef<{ ctx: AudioContext; nodes: AudioNode[] } | null>(null);
 
   useEffect(() => {
     appRef.current?.setAttribute("data-hydrated", "true");
@@ -316,93 +330,12 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
     }, 0);
     return () => window.clearTimeout(timeout);
   }, [commitState, state.currentQuestion?.type, state.timerEndsAt, state.timerRunning, timerRemaining]);
-  const stopAmbience = useCallback(() => {
-    const ambience = ambienceRef.current;
-    if (!ambience) return;
-    for (const node of ambience.nodes) {
-      try {
-        if ("stop" in node && typeof node.stop === "function") node.stop();
-        node.disconnect();
-      } catch {
-        // Audio nodes may already be stopped by the browser.
-      }
-    }
-    void ambience.ctx.close();
-    ambienceRef.current = null;
-  }, []);
-
-  const startAmbience = useCallback(() => {
-    if (ambienceRef.current || typeof window === "undefined") return;
-    const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-    if (!AudioContextClass) return;
-    const ctx = new AudioContextClass();
-    const master = ctx.createGain();
-    const filter = ctx.createBiquadFilter();
-    const low = ctx.createOscillator();
-    const high = ctx.createOscillator();
-    const pulse = ctx.createOscillator();
-    const pulseGain = ctx.createGain();
-
-    master.gain.value = 0.018;
-    filter.type = "lowpass";
-    filter.frequency.value = 520;
-    low.type = "sine";
-    low.frequency.value = 110;
-    high.type = "triangle";
-    high.frequency.value = 220;
-    pulse.type = "square";
-    pulse.frequency.value = 2.2;
-    pulseGain.gain.value = 0.003;
-
-    low.connect(filter);
-    high.connect(filter);
-    pulse.connect(pulseGain);
-    pulseGain.connect(filter);
-    filter.connect(master);
-    master.connect(ctx.destination);
-    low.start();
-    high.start();
-    pulse.start();
-    ambienceRef.current = { ctx, nodes: [low, high, pulse, pulseGain, filter, master] };
-  }, []);
-
-  const toggleAmbience = () => {
-    if (state.sound) {
-      stopAmbience();
-      update({ sound: false });
-      return;
-    }
-    startAmbience();
-    update({ sound: true });
-  };
-
-  useEffect(() => () => stopAmbience(), [stopAmbience]);
-
-  const playSound = () => {
-    if (!state.sound || typeof window === "undefined") return;
-    const ctx = ambienceRef.current?.ctx;
-    if (!ctx) return;
-    const oscillator = ctx.createOscillator();
-    const gain = ctx.createGain();
-    oscillator.type = "triangle";
-    oscillator.frequency.setValueAtTime(440, ctx.currentTime);
-    oscillator.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.08);
-    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
-    gain.gain.exponentialRampToValueAtTime(0.045, ctx.currentTime + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.16);
-    oscillator.connect(gain);
-    gain.connect(ctx.destination);
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + 0.18);
-  };
-
   const startGame = () => {
     commitState((value) => {
       const players = value.players.map((player) => ({ ...player, name: player.name.trim() })).filter((player) => player.name);
       if (players.length < 2) return value;
       return { ...value, stage: "play", players, currentPlayerIndex: 0, currentQuestion: null, history: [], usedTruthIds: [], usedDareIds: [], ...clearTimerPatch() };
     });
-    playSound();
   };
 
   const chooseQuestion = (forcedType?: QuestionType) => {
@@ -427,7 +360,6 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
     const resetPatch = available.length ? {} : type === "truth" ? { usedTruthIds: [] } : { usedDareIds: [] };
     update({ ...resetPatch, currentQuestion: selected, lastAutoType: type, ...(selected.type === "dare" ? createDareTimerPatch(30) : clearTimerPatch()), ...(type === "truth" ? { usedTruthIds: [...(available.length ? state.usedTruthIds : []), selected.id] } : { usedDareIds: [...(available.length ? state.usedDareIds : []), selected.id] }) });
     setNow(Date.now());
-    playSound();
   };
 
   const markResult = (result: Result) => {
@@ -436,7 +368,6 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
     const turn: Turn = { id: id("turn"), playerName: currentPlayer.name, type: state.currentQuestion.type, question: state.currentQuestion.text, result, points, at: new Date().toISOString() };
     const players = state.players.map((player) => player.id === currentPlayer.id ? { ...player, score: player.score + points, completed: player.completed + (result === "completed" ? 1 : 0), skipped: player.skipped + (result === "skipped" ? 1 : 0), failed: player.failed + (result === "failed" ? 1 : 0) } : player);
     update({ players, history: [turn, ...state.history].slice(0, 60), currentPlayerIndex: (state.currentPlayerIndex + 1) % players.length, currentQuestion: null, ...clearTimerPatch() });
-    playSound();
   };
 
   const addPlayer = () => update({ players: [...state.players, createPlayer(`Player ${state.players.length + 1}`)] });
@@ -574,13 +505,12 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
 
   return (
     <main ref={appRef} data-testid="truth-dare-app" data-hydrated="false" className="scanline min-h-screen bg-ink text-white">
+      <DareDeckLoader />
       <div className="cyber-grid pointer-events-none absolute inset-x-0 top-0 h-[720px]" />
       <header className="relative z-10 border-b border-white/10 bg-ink/88 text-white backdrop-blur-xl">
         <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-4 lg:px-8">
           <Link href="/#case-files" className="inline-flex items-center gap-2 text-sm font-bold text-mint hover:text-white"><ArrowLeft size={16} />Back to case files</Link>
-          <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={toggleAmbience} className="border border-white/12 px-3 py-2 text-xs font-bold text-white/70 hover:border-mint hover:text-mint">{state.sound ? <Volume2 className="mr-2 inline" size={14} /> : <VolumeX className="mr-2 inline" size={14} />}Ambience</button>
-          </div>
+          <span className="font-mono text-xs uppercase text-white/40">Truth. Dare. Sync.</span>
         </nav>
       </header>
 

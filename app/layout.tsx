@@ -117,7 +117,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${jetbrainsMono.variable}`}>
+      <body suppressHydrationWarning className={`${inter.variable} ${jetbrainsMono.variable}`}>
         <a href="#main-content" className="skip-link">Skip to main content</a>
         <NavigationMemory />
         <div id="main-content" tabIndex={-1}>{children}</div>
