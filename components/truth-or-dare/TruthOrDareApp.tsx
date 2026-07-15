@@ -231,6 +231,7 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
   const applyingRemoteState = useRef(false);
   const onlineSyncTimer = useRef<number | null>(null);
   const lastOnlineState = useRef("");
+  const ambienceRef = useRef<{ ctx: AudioContext; nodes: AudioNode[] } | null>(null);
 
   useEffect(() => {
     appRef.current?.setAttribute("data-hydrated", "true");
@@ -315,19 +316,84 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
     }, 0);
     return () => window.clearTimeout(timeout);
   }, [commitState, state.currentQuestion?.type, state.timerEndsAt, state.timerRunning, timerRemaining]);
-  const playSound = () => {
-    if (!state.sound || typeof window === "undefined") return;
+  const stopAmbience = useCallback(() => {
+    const ambience = ambienceRef.current;
+    if (!ambience) return;
+    for (const node of ambience.nodes) {
+      try {
+        if ("stop" in node && typeof node.stop === "function") node.stop();
+        node.disconnect();
+      } catch {
+        // Audio nodes may already be stopped by the browser.
+      }
+    }
+    void ambience.ctx.close();
+    ambienceRef.current = null;
+  }, []);
+
+  const startAmbience = useCallback(() => {
+    if (ambienceRef.current || typeof window === "undefined") return;
     const AudioContextClass = window.AudioContext || (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
     if (!AudioContextClass) return;
     const ctx = new AudioContextClass();
+    const master = ctx.createGain();
+    const filter = ctx.createBiquadFilter();
+    const low = ctx.createOscillator();
+    const high = ctx.createOscillator();
+    const pulse = ctx.createOscillator();
+    const pulseGain = ctx.createGain();
+
+    master.gain.value = 0.018;
+    filter.type = "lowpass";
+    filter.frequency.value = 520;
+    low.type = "sine";
+    low.frequency.value = 110;
+    high.type = "triangle";
+    high.frequency.value = 220;
+    pulse.type = "square";
+    pulse.frequency.value = 2.2;
+    pulseGain.gain.value = 0.003;
+
+    low.connect(filter);
+    high.connect(filter);
+    pulse.connect(pulseGain);
+    pulseGain.connect(filter);
+    filter.connect(master);
+    master.connect(ctx.destination);
+    low.start();
+    high.start();
+    pulse.start();
+    ambienceRef.current = { ctx, nodes: [low, high, pulse, pulseGain, filter, master] };
+  }, []);
+
+  const toggleAmbience = () => {
+    if (state.sound) {
+      stopAmbience();
+      update({ sound: false });
+      return;
+    }
+    startAmbience();
+    update({ sound: true });
+  };
+
+  useEffect(() => () => stopAmbience(), [stopAmbience]);
+
+  const playSound = () => {
+    if (!state.sound || typeof window === "undefined") return;
+    const ctx = ambienceRef.current?.ctx;
+    if (!ctx) return;
     const oscillator = ctx.createOscillator();
     const gain = ctx.createGain();
+    oscillator.type = "triangle";
+    oscillator.frequency.setValueAtTime(440, ctx.currentTime);
+    oscillator.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.08);
+    gain.gain.setValueAtTime(0.0001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.045, ctx.currentTime + 0.015);
+    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.16);
     oscillator.connect(gain);
     gain.connect(ctx.destination);
-    oscillator.frequency.value = 640;
-    gain.gain.value = 0.035;
     oscillator.start();
-    oscillator.stop(ctx.currentTime + 0.08);
+    oscillator.stop(ctx.currentTime + 0.18);
   };
 
   const startGame = () => {
@@ -513,7 +579,7 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
         <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-4 lg:px-8">
           <Link href="/#case-files" className="inline-flex items-center gap-2 text-sm font-bold text-mint hover:text-white"><ArrowLeft size={16} />Back to case files</Link>
           <div className="flex flex-wrap gap-2">
-            <button type="button" onClick={() => update({ sound: !state.sound })} className="border border-white/12 px-3 py-2 text-xs font-bold text-white/70 hover:border-mint hover:text-mint">{state.sound ? <Volume2 className="mr-2 inline" size={14} /> : <VolumeX className="mr-2 inline" size={14} />}Sound</button>
+            <button type="button" onClick={toggleAmbience} className="border border-white/12 px-3 py-2 text-xs font-bold text-white/70 hover:border-mint hover:text-mint">{state.sound ? <Volume2 className="mr-2 inline" size={14} /> : <VolumeX className="mr-2 inline" size={14} />}Ambience</button>
           </div>
         </nav>
       </header>
@@ -527,7 +593,7 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
 }
 
 function Landing({ onStart }: { onStart: () => void }) {
-  return <section className="relative mx-auto grid min-h-[calc(100vh-72px)] max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:px-8"><div><p className="font-mono text-sm uppercase text-mint">Portfolio game product</p><h1 className="mt-4 max-w-4xl text-5xl font-black leading-tight text-white md:text-7xl">DareDeck turns Truth and Dare into a real product.</h1><p className="mt-6 max-w-2xl text-lg leading-8 text-white/68">Create local rooms, import custom packs, run timed dares, track points, and export sessions. It is offline-first, and Supabase online rooms let invited players share the same game state.</p><div className="mt-8 flex flex-wrap gap-3"><button type="button" data-testid="truth-dare-open-setup" onClick={onStart} className="inline-flex items-center gap-2 bg-mint px-5 py-3 font-bold text-ink hover:bg-white"><Play size={18} />Start game</button><a href="#architecture" className="inline-flex items-center gap-2 border border-white/18 px-5 py-3 font-bold text-white hover:border-cyan hover:text-cyan">View architecture</a></div></div><div className="panel-glow border border-mint/20 bg-panel/80 p-5"><div className="overflow-hidden border border-white/10 bg-black/35"><Image src="/images/truth-or-dare.png" alt="DareDeck game interface preview" width={1364} height={646} className="aspect-video w-full object-cover object-top" priority /></div><div className="mt-4 grid gap-3 sm:grid-cols-2"><Feature icon={<UsersIcon />} title="Local room" text="Play locally with no accounts, or create an online invite room when Supabase is configured." /><Feature icon={<Upload size={20} />} title="Question packs" text="Import JSON, CSV, or TXT packs with validation and preview before use." /><Feature icon={<Trophy size={20} />} title="Scoring engine" text="Truths, dares, skips, failures, and challenge mode multipliers." /><Feature icon={<History size={20} />} title="Session memory" text="LocalStorage persistence, online room snapshots, history, export, and import." /></div></div></section>;
+  return <section className="relative mx-auto grid min-h-[calc(100vh-72px)] max-w-7xl items-center gap-10 px-5 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:px-8"><div><p className="font-mono text-sm uppercase text-mint">Portfolio game product</p><h1 className="mt-4 max-w-4xl text-5xl font-black leading-tight text-white md:text-7xl">DareDeck turns Truth and Dare into a real product.</h1><p className="mt-6 max-w-2xl text-lg leading-8 text-white/68">Create local rooms, import custom packs, run timed dares, track points, and export sessions. It is offline-first, and Supabase online rooms let invited players share the same game state.</p><div className="mt-8 flex flex-wrap gap-3"><button type="button" data-testid="truth-dare-open-setup" onClick={onStart} className="inline-flex items-center gap-2 bg-mint px-5 py-3 font-bold text-ink hover:bg-white"><Play size={18} />Start game</button></div></div><div className="panel-glow border border-mint/20 bg-panel/80 p-5"><div className="overflow-hidden border border-white/10 bg-black/35"><Image src="/images/truth-or-dare.png" alt="DareDeck game interface preview" width={1364} height={646} className="aspect-video w-full object-cover object-top" priority /></div><div className="mt-4 grid gap-3 sm:grid-cols-2"><Feature icon={<UsersIcon />} title="Local room" text="Play locally with no accounts, or create an online invite room when Supabase is configured." /><Feature icon={<Upload size={20} />} title="Question packs" text="Import JSON, CSV, or TXT packs with validation and preview before use." /><Feature icon={<Trophy size={20} />} title="Scoring engine" text="Truths, dares, skips, failures, and challenge mode multipliers." /><Feature icon={<History size={20} />} title="Session memory" text="LocalStorage persistence, online room snapshots, history, export, and import." /></div></div></section>;
 }
 
 function UsersIcon() { return <Sparkles size={20} />; }
@@ -545,7 +611,7 @@ function Setup(props: { state: GameState; activeQuestions: Question[]; inviteUrl
 
 function PlayStage({ state, currentPlayer, rankings, activeQuestions, chooseQuestion, markResult, timer, timerRunning, onlineRoom, devicePlayerId, setOnlinePlayerId, toggleTimer, finish }: { state: GameState; currentPlayer: Player; rankings: Player[]; activeQuestions: Question[]; chooseQuestion: (type?: QuestionType) => void; markResult: (result: Result) => void; timer: number; timerRunning: boolean; onlineRoom: OnlineRoom; devicePlayerId: string; setOnlinePlayerId: (playerId: string) => void; toggleTimer: () => void; finish: () => void }) {
   const resultLocked = onlineRoom.enabled && devicePlayerId === currentPlayer?.id;
-  const resultHelp = resultLocked ? "This is your turn. Another player must mark the result." : onlineRoom.enabled ? "You are judging this turn from this device." : "Mark the result when the turn is done.";
+  const resultHelp = resultLocked ? "Answer out loud or perform the dare. Another player must mark the result." : onlineRoom.enabled ? "Watch the turn, then judge the result from this device." : "Answer or perform face-to-face, then mark the result.";
   const resultButtonClass = "px-4 py-3 font-bold disabled:cursor-not-allowed disabled:opacity-35";
   return <section className="relative mx-auto max-w-7xl px-5 py-14 lg:px-8"><div className="flex flex-col justify-between gap-4 md:flex-row md:items-end"><SectionHeader eyebrow={state.mode} title={state.gameName} text={`${activeQuestions.length} active questions / ${state.history.length} turns played`} /><button type="button" onClick={finish} className="border border-amber/40 px-4 py-3 font-bold text-amber hover:bg-amber hover:text-ink">End game</button></div><div className="mt-10 grid gap-6 lg:grid-cols-[0.72fr_0.28fr]"><div className="panel-glow border border-mint/20 bg-panel/85 p-5"><p className="font-mono text-xs uppercase text-cyan">Current turn</p><h2 className="mt-3 text-4xl font-black text-white md:text-6xl">{currentPlayer?.name}</h2>{!state.currentQuestion ? <div className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-3"><button type="button" onClick={() => chooseQuestion("truth")} disabled={state.mode !== "classic"} className="border border-cyan/30 bg-cyan/10 p-5 text-left font-black text-cyan disabled:opacity-35">Truth</button><button type="button" onClick={() => chooseQuestion("dare")} disabled={state.mode !== "classic"} className="border border-red-300/30 bg-red-500/10 p-5 text-left font-black text-red-200 disabled:opacity-35">Dare</button><button type="button" data-testid="truth-dare-draw-question" onClick={() => chooseQuestion()} className="col-span-2 border border-mint/35 bg-mint/10 p-5 text-left font-black text-mint sm:col-span-1"><Shuffle className="mb-3" />Draw question</button></div> : <div className="mt-8 animate-[route-enter_420ms_ease_both] border border-white/10 bg-black/35 p-6"><p className="font-mono text-xs uppercase text-mint">{state.currentQuestion.type}{state.currentQuestion.difficulty === "hard" ? " / hard" : ""}</p><p className="mt-4 text-3xl font-black leading-tight text-white">{state.currentQuestion.text}</p>{state.currentQuestion.type === "dare" && <div className="mt-6 flex flex-wrap items-center gap-3"><span className={`inline-flex items-center gap-2 border px-4 py-3 font-mono text-xl ${state.timerExpired ? "border-red-300/35 text-red-200" : "border-white/10 text-amber"}`}><Timer size={20} />{timer}s</span><button type="button" onClick={toggleTimer} className="border border-amber/35 px-4 py-3 font-bold text-amber hover:bg-amber hover:text-ink">{timerRunning ? "Pause" : state.timerExpired ? "Restart timer" : "Start timer"}</button>{state.timerExpired && <span className="border border-red-300/30 bg-red-500/10 px-4 py-3 text-sm font-bold text-red-100">Time up. The group should judge the result.</span>}</div>}<div className="mt-8 border border-white/10 bg-white/[0.03] p-4"><p className="font-mono text-xs uppercase text-white/45">Result decided by the group</p><p className="mt-2 text-sm leading-6 text-white/58">{resultHelp}</p><div className="mt-3 grid gap-3 sm:grid-cols-3"><button type="button" onClick={() => markResult("completed")} disabled={resultLocked} className={`${resultButtonClass} bg-mint text-ink`}>Completed</button><button type="button" onClick={() => markResult("skipped")} disabled={resultLocked} className={`${resultButtonClass} border border-amber/35 text-amber hover:bg-amber hover:text-ink`}>Skipped</button><button type="button" onClick={() => markResult("failed")} disabled={resultLocked} className={`${resultButtonClass} border border-red-300/35 text-red-200 hover:bg-red-500/10`}>Failed</button></div></div></div>}</div><aside className="space-y-5"><DeviceIdentityControl players={state.players} onlineRoom={onlineRoom} devicePlayerId={devicePlayerId} setOnlinePlayerId={setOnlinePlayerId} /><Scoreboard rankings={rankings} /><Panel title="Turn history"><div className="max-h-80 space-y-3 overflow-auto pr-1">{state.history.slice(0, 8).map((turn) => <div key={turn.id} className="border border-white/10 bg-black/25 p-3 text-xs text-white/60"><p className="font-bold text-white">{turn.playerName} <span className={turn.points >= 0 ? "text-mint" : "text-red-200"}>{turn.points >= 0 ? "+" : ""}{turn.points}</span></p><p className="mt-1 capitalize text-cyan">{turn.type} / {turn.result}</p></div>)}</div></Panel></aside></div></section>;
 }
