@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { type ChangeEvent, type ReactNode, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -221,13 +220,15 @@ function DareDeckLoader() {
   const [visible, setVisible] = useState(true);
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setVisible(false), shouldSkipDareDeckLoader() ? 0 : 3000);
+    const timer = window.setTimeout(() => setVisible(false), shouldSkipDareDeckLoader() ? 0 : 2600);
     return () => window.clearTimeout(timer);
   }, []);
 
   if (!visible) return null;
 
-  return <div data-testid="daredeck-loader" className="fixed left-0 top-0 z-[100] h-[125dvh] w-[125vw] overflow-hidden bg-ink text-white"><video src={dareDeckLoaderVideo} autoPlay muted playsInline preload="auto" className="absolute inset-0 h-full w-full object-cover object-center opacity-80 saturate-125 contrast-110" onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 2.95) setVisible(false); }} onEnded={() => setVisible(false)} /><div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(66,255,179,0.12),rgba(3,6,5,0.66)_58%,rgba(3,6,5,0.96))]" /><div className="absolute inset-0 cyber-grid opacity-[0.14]" /><div className="absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-ink via-ink/86 to-transparent" /><div className="relative flex min-h-[125dvh] flex-col justify-end gap-4 px-5 pb-16 pt-10 sm:flex-row sm:items-end sm:justify-between sm:px-8 sm:pb-14"><div className="max-w-xl"><p className="font-mono text-xs uppercase tracking-[0.22em] text-mint">Loading DareDeck</p><h1 className="mt-3 max-w-[14ch] text-3xl font-black leading-tight text-white sm:max-w-none sm:text-5xl">Truth. Dare. Sync.</h1><p className="mt-3 max-w-md text-sm leading-6 text-white/62">Preparing cards, room state, timer, and fair judging.</p></div><button type="button" onClick={() => setVisible(false)} className="w-fit shrink-0 border border-white/18 bg-ink/55 px-4 py-3 text-xs font-bold text-white/70 backdrop-blur-md hover:border-mint hover:text-mint">Skip</button></div></div>;
+  const close = () => setVisible(false);
+
+  return <div data-testid="daredeck-loader" className="fixed left-0 top-0 z-[100] h-[125dvh] w-[125vw] overflow-hidden bg-ink text-white"><video src={dareDeckLoaderVideo} autoPlay muted playsInline preload="auto" className="absolute inset-0 h-full w-full object-cover object-center opacity-80 saturate-125 contrast-110" onError={close} onStalled={() => window.setTimeout(close, 900)} onWaiting={() => window.setTimeout(close, 900)} onTimeUpdate={(event) => { if (event.currentTarget.currentTime >= 2.8) close(); }} onEnded={close} /><div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_34%,rgba(66,255,179,0.12),rgba(3,6,5,0.66)_58%,rgba(3,6,5,0.96))]" /><div className="absolute inset-0 cyber-grid opacity-[0.14]" /><div className="absolute inset-x-0 bottom-0 h-72 bg-gradient-to-t from-ink via-ink/86 to-transparent" /><div className="absolute left-0 top-0 flex min-h-dvh w-screen flex-col justify-end gap-4 px-5 pb-12 pt-6 sm:flex-row sm:items-end sm:justify-between sm:px-8 sm:pb-12"><div className="max-w-xl"><p className="font-mono text-xs uppercase tracking-[0.22em] text-mint">Loading DareDeck</p><h1 className="mt-3 max-w-[14ch] text-3xl font-black leading-tight text-white sm:max-w-none sm:text-5xl">Truth. Dare. Sync.</h1><p className="mt-3 max-w-md text-sm leading-6 text-white/62">Preparing cards, room state, timer, and fair judging.</p></div><button type="button" onClick={close} className="w-fit shrink-0 border border-white/18 bg-ink/55 px-4 py-3 text-xs font-bold text-white/70 backdrop-blur-md hover:border-mint hover:text-mint">Skip intro</button></div></div>;
 }
 
 export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: Stage } = {}) {
@@ -503,13 +504,27 @@ export function TruthOrDareApp({ initialStage = "landing" }: { initialStage?: St
     }
   };
 
+  const goBack = () => {
+    const fallback = "/#case-files";
+    try {
+      const referrer = document.referrer ? new URL(document.referrer) : null;
+      if (referrer?.origin === window.location.origin && window.history.length > 1) {
+        window.history.back();
+        return;
+      }
+    } catch {
+      // Fall back when referrer parsing fails.
+    }
+    window.location.href = fallback;
+  };
+
   return (
     <main ref={appRef} data-testid="truth-dare-app" data-hydrated="false" className="scanline min-h-screen bg-ink text-white">
       <DareDeckLoader />
       <div className="cyber-grid pointer-events-none absolute inset-x-0 top-0 h-[720px]" />
       <header className="relative z-10 border-b border-white/10 bg-ink/88 text-white backdrop-blur-xl">
         <nav className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-3 px-5 py-4 lg:px-8">
-          <Link href="/#case-files" className="inline-flex items-center gap-2 text-sm font-bold text-mint hover:text-white"><ArrowLeft size={16} />Back to case files</Link>
+          <button type="button" onClick={goBack} className="inline-flex items-center gap-2 text-sm font-bold text-mint hover:text-white"><ArrowLeft size={16} />Back</button>
           <span className="font-mono text-xs uppercase text-white/40">Truth. Dare. Sync.</span>
         </nav>
       </header>
