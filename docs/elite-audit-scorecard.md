@@ -74,22 +74,35 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 
 ## Final Perfection Checklist
 
+### Completed
+
 - [x] Production security headers exist.
-- [x] Contact API validates and rate-limits input.
+- [x] Contact API validates, sanitizes, and rate-limits input.
+- [x] Mail/client fallback exists for contact delivery.
 - [x] Metadata and canonical URLs are present.
 - [x] Sitemap and robots are generated.
+- [x] Open Graph and structured data are implemented.
 - [x] Static and live audits exist.
 - [x] Large public asset audit exists.
-- [x] Unused heavy screenshots removed.
-- [x] Add browser automation tests.
-- [x] Add Lighthouse or performance budget checks.
+- [x] Performance budget checks exist.
+- [x] Unused heavy screenshots were removed.
+- [x] Browser automation tests exist for key public routes.
+- [x] Desktop and mobile smoke tests exist.
+- [x] Source-aware navigation/back behavior is covered for important flows.
+- [x] WaskiZone service configurator, contact flow, and policy pages exist.
+- [x] DareDeck is shipped as a portfolio case study and playable route.
+- [x] Supabase-backed online rooms exist for DareDeck.
+- [x] DareDeck synced timer, judging controls, invite feedback, and loader are implemented.
+- [x] A CI workflow runs the local quality gate.
+- [x] Dependency/security scanning is part of the release process.
+- [x] Release and feature closeout documentation exists.
+
+### Still Open For Future Fixes Or New Phases
+
 - [ ] Compress and/or create mobile versions of loader videos.
-- [ ] Perform keyboard and screen-reader QA.
+- [ ] Perform a manual keyboard and screen-reader QA pass.
 - [ ] Add visual regression screenshots for key pages.
 - [ ] Split oversized components into smaller modules.
-- [x] Add a CI workflow for `npm run audit:all`.
-- [x] Add dependency/security scanning to release process.
-- [x] Add Supabase-backed online rooms for DareDeck.
-- [x] Add release and feature closeout documentation.
-- [ ] Add more real project media and proof assets.
+- [ ] Add more real project media, demos, testimonials, and proof assets.
+- [ ] Define and review useful analytics events.
 - [ ] Revisit CMS/admin only after the static public site is fully stable.
