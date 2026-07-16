@@ -20,10 +20,10 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 | Backend/API | 7 | Good | Contact API and GitHub feed API are hardened for the current site size. No database-backed features are active yet. |
 | Frontend | 8 | Strong | App router, dynamic pages, videos, modes, loaders, and service flows are in place. Future work: visual regression checks. |
 | DevOps | 8 | Strong | Vercel deploys, scheduled GitHub feed updates, audit commands, and a GitHub Actions quality gate are in place. |
-| Testing | 7 | Good | Playwright browser smoke tests now cover key desktop/mobile routes, source-aware navigation, WaskiZone service flow, contact mail links, and visible overflow checks. |
-| Product Quality | 8 | Strong | Portfolio and WaskiZone now tell a clearer story. Future work: more proof, testimonials, project media, and tighter conversion copy. |
+| Testing | 8 | Strong | Playwright browser smoke tests cover key desktop/mobile routes, source-aware navigation, WaskiZone service flow, contact mail links, visible overflow checks, and the DareDeck start flow. |
+| Product Quality | 8.5 | Strong | Portfolio, WaskiZone, and DareDeck now show a clearer product story. Future work: more proof, testimonials, project media, and tighter conversion copy. |
 
-**Overall score:** 8.0 / 10
+**Overall score:** 8.2 / 10
 
 ## Completed From The Audit Prompt
 
@@ -41,6 +41,8 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 - GitHub Actions quality gate now runs audits and browser smoke tests.
 - Next.js and PostCSS patched to resolve npm audit findings.
 - Performance budget audit added for referenced media, video totals, oversized images, and unused large public assets.
+- DareDeck shipped as a portfolio-grade project with local play, imports, fair randomization, scoring, online rooms, synced timers, judging controls, and a dedicated loader.
+- DareDeck implementation notes and a reusable release checklist were added under `docs/`.
 
 ## Remaining High-Value Work
 
@@ -56,7 +58,7 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 
 | Problem | Why It Matters | Recommended Solution | Effort |
 | --- | --- | --- | --- |
-| Long components | Large files are harder to maintain and review. | Split major sections into smaller feature components. | Medium |
+| Long components | Large files are harder to maintain and review. DareDeck is now useful but should be modularized after the current feature line settles. | Split major sections and the game surface into smaller feature components. | Medium |
 | Manual content updates | New projects/writeups require code changes. | Revisit CMS/admin later after the public site is stable. | High |
 | Accessibility needs real assistive-tech pass | Static checks do not prove good screen-reader flow. | Test keyboard order, focus traps, alt text, headings, and form announcements. | Medium |
 | Limited proof assets | Visitors trust real work more than claims. | Add more project screenshots, short demos, and future client/testimonial proof. | Medium |
@@ -87,5 +89,6 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 - [ ] Split oversized components into smaller modules.
 - [x] Add a CI workflow for `npm run audit:all`.
 - [x] Add dependency/security scanning to release process.
+- [x] Add release and feature closeout documentation.
 - [ ] Add more real project media and proof assets.
 - [ ] Revisit CMS/admin only after the static public site is fully stable.
