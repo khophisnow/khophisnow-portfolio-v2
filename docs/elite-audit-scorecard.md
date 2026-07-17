@@ -12,7 +12,7 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 | Accessibility | 7 | Good | Focus styles, skip link, semantic metadata, labels, and reduced-motion handling exist. A screen-reader and keyboard pass is still needed. |
 | SEO | 8 | Strong | Metadata, canonical URLs, Open Graph, sitemap, robots, and structured data are implemented. Future work: richer page-specific copy and image metadata. |
 | Security | 8.5 | Strong | Security headers, contact validation, rate limiting, environment fallback behavior, safer API handling, and npm audit checks in the quality gate are implemented. Future work: periodic dependency review after major package updates. |
-| Performance | 8 | Strong | Loader behavior, asset checks, unused large asset cleanup, and enforceable media performance budgets are in place. Future work: video compression and Lighthouse-based UX metrics. |
+| Performance | 8.5 | Strong | Loader behavior, asset checks, unused large asset cleanup, compressed loader/page videos, and enforceable media performance budgets are in place. Future work: Lighthouse-based UX metrics and optional mobile-specific video variants. |
 | Code Quality | 8 | Strong | Lint/build pass and audit scripts are available. Future work: component-level tests and reducing very large component files. |
 | Maintainability | 8 | Strong | Shared data modules and audit scripts help keep changes organized. Future work: split long page sections into smaller feature modules. |
 | Scalability | 7 | Good | Static-first public site is reliable. Content management is still manual until a CMS/admin phase is introduced. |
@@ -23,7 +23,7 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 | Testing | 8 | Strong | Playwright browser smoke tests cover key desktop/mobile routes, source-aware navigation, WaskiZone service flow, contact mail links, visible overflow checks, and the DareDeck start flow. |
 | Product Quality | 8.5 | Strong | Portfolio, WaskiZone, and DareDeck now show a clearer product story. Future work: more proof, testimonials, project media, and tighter conversion copy. |
 
-**Overall score:** 8.3 / 10
+**Overall score:** 8.4 / 10
 
 ## Completed From The Audit Prompt
 
@@ -41,6 +41,7 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 - GitHub Actions quality gate now runs audits and browser smoke tests.
 - Next.js and PostCSS patched to resolve npm audit findings.
 - Performance budget audit added for referenced media, video totals, oversized images, and unused large public assets.
+- Active loader and page videos were compressed below the 1MB public asset threshold.
 - DareDeck shipped as a portfolio-grade project with local play, imports, fair randomization, scoring, Supabase online rooms, synced timers, judging controls, and a dedicated loader.
 - DareDeck implementation notes and a reusable release checklist were added under `docs/`.
 
@@ -51,7 +52,7 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 | Problem | Why It Matters | Recommended Solution | Effort |
 | --- | --- | --- | --- |
 | No Lighthouse field metrics | Lab and field performance can still drift beyond simple asset budgets. | Add Lighthouse or Vercel Speed Insights review targets after the media budget is stable. | Medium |
-| Large video reliance | Videos create strong identity but can hurt first-load experience. | Compress videos, add mobile-specific variants, and set size budgets. | Medium |
+| Large video reliance | Videos create strong identity but can still affect first-load experience on weaker connections. | Keep compressed MP4s under budget and later add mobile-specific variants if Lighthouse or real-device testing shows a need. | Low |
 | No visual regression checks | UI changes can break mobile spacing without failing build. | Add screenshot checkpoints for key routes. | Medium |
 
 ### High Priority
@@ -99,7 +100,8 @@ This scorecard tracks the production-readiness review for the KhophiSnow portfol
 
 ### Still Open For Future Fixes Or New Phases
 
-- [ ] Compress and/or create mobile versions of loader videos.
+- [x] Compress active loader and page videos below the current public asset budget.
+- [ ] Create mobile-specific video variants if real-device performance needs it.
 - [ ] Perform a manual keyboard and screen-reader QA pass.
 - [ ] Add visual regression screenshots for key pages.
 - [ ] Split oversized components into smaller modules.
