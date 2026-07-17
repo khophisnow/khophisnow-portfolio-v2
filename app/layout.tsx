@@ -100,12 +100,12 @@ const structuredData = {
     },
     {
       "@type": "ProfessionalService",
-      "@id": "https://khophisnow.vercel.app/waskizone#service",
+      "@id": "https://waskizone.vercel.app/#company",
       name: "WaskiZone",
-      url: "https://khophisnow.vercel.app/waskizone",
+      url: "https://waskizone.vercel.app",
       founder: { "@id": "https://khophisnow.vercel.app/#person" },
       areaServed: "Ghana",
-      serviceType: ["Software development", "Backend API engineering", "Dashboard development", "Authorized cybersecurity support"],
+      serviceType: ["Software development", "School management systems", "Authorized cybersecurity support", "Data analysis"],
     },
   ],
 };

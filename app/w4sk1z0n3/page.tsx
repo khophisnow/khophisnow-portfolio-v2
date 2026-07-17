@@ -17,7 +17,7 @@ export default function W4sk1Z0n3Page() {
   return (
     <main className="scanline min-h-screen bg-ink text-white">
       <section className="mx-auto max-w-7xl px-5 py-12 lg:px-8">
-        <SourceBackLink fallback={{ href: "/waskizone", label: "Back to WaskiZone" }} sources={{ cybersecurity: { href: "/waskizone#cybersecurity", label: "Back to security services" } }} />
+        <SourceBackLink fallback={{ href: "https://waskizone.vercel.app", label: "Back to WaskiZone" }} sources={{ cybersecurity: { href: "https://waskizone.vercel.app/cybersecurity", label: "Back to security services" } }} />
         <div className="mt-12 grid gap-10 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
             <p className="font-mono text-sm uppercase text-red-300">Cybersecurity service identity</p>

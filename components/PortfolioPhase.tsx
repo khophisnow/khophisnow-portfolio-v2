@@ -243,10 +243,10 @@ export function MobilePerformancePass() {
 }
 
 const serviceRecommendations = {
-  website: { label: "Professional website", package: "Launch Presence", detail: "A clear public site, responsive design, contact flow, deployment, and handover notes.", href: "/waskizone/services/full-stack-web-applications" },
-  api: { label: "Backend API", package: "API Foundation", detail: "Authentication, roles, database schema, documented REST endpoints, and deployment notes.", href: "/waskizone/services/backend-api-engineering" },
-  dashboard: { label: "Dashboard or internal tool", package: "Secure Product Build", detail: "Role-aware screens, forms, reporting, backend workflows, and operational handover.", href: "/waskizone/services/dashboards-and-internal-tools" },
-  security: { label: "Security review", package: "Security Review", detail: "Authorized API/web review, access-control notes, risk summary, and hardening actions.", href: "/waskizone/services/cybersecurity-support" },
+  website: { label: "Professional website", package: "Launch Presence", detail: "A clear public site, responsive design, contact flow, deployment, and handover notes.", href: "https://waskizone.vercel.app/services/full-stack-web-applications" },
+  api: { label: "Backend API", package: "API Foundation", detail: "Authentication, roles, database schema, documented REST endpoints, and deployment notes.", href: "https://waskizone.vercel.app/services/backend-api-engineering" },
+  dashboard: { label: "Dashboard or internal tool", package: "Secure Product Build", detail: "Role-aware screens, forms, reporting, backend workflows, and operational handover.", href: "https://waskizone.vercel.app/services/dashboards-and-internal-tools" },
+  security: { label: "Security review", package: "Security Review", detail: "Authorized API/web review, access-control notes, risk summary, and hardening actions.", href: "https://waskizone.vercel.app/cybersecurity" },
 } as const;
 
 export function WaskiServiceConfigurator() {

@@ -20,6 +20,8 @@ import {
   Users,
 } from "lucide-react";
 
+export const waskiZoneSiteUrl = "https://waskizone.vercel.app";
+
 export const navItems = ["Identity", "Modes", "Status", "Case Files", "Evidence", "Lab", "Writeups", "WaskiZone", "Contact"];
 
 export const proof = [
@@ -229,7 +231,7 @@ export const downloads = [
   { label: "Download CV", href: "/cv/somuah-julius-software-developer-cv-2026.pdf", icon: Download },
   { label: "GitHub", href: "https://github.com/khophisnow", icon: Github },
   { label: "LinkedIn", href: "https://www.linkedin.com/in/khophisnow", icon: Linkedin },
-  { label: "WaskiZone Services", href: "/waskizone", icon: Code2 },
+  { label: "WaskiZone", href: waskiZoneSiteUrl, icon: Code2 },
   { label: "DareDeck", href: "/truth-or-dare", icon: Code2 },
   { label: "WhatsUpUCC API Docs", href: "https://whats-up-ucc-backend.onrender.com/api-docs/", icon: FileJson },
 ];
@@ -252,7 +254,7 @@ export const commandActions = [
   { label: "Open security lab", href: "#lab", hint: "g l" },
   { label: "Download CV", href: "/cv/somuah-julius-software-developer-cv-2026.pdf", hint: "g v" },
   { label: "GitHub", href: "https://github.com/khophisnow", hint: "g h" },
-  { label: "WaskiZone services", href: "/waskizone", hint: "g w" },
+  { label: "WaskiZone company", href: waskiZoneSiteUrl, hint: "g w" },
   { label: "DareDeck game", href: "/truth-or-dare", hint: "g t" },
   { label: "Contact", href: "#contact", hint: "g c" },
 ];

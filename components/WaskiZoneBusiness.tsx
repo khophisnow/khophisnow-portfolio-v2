@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useMemo, useState } from "react";
 import { ArrowUpRight, Calculator, LockKeyhole, Send, Star } from "lucide-react";
 import { waskiPackages, waskiSecurityPolicy, waskiTestimonials } from "@/lib/portfolio-data";
@@ -22,7 +21,7 @@ export function WaskiPackageComparison() {
       <div className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
         <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
           <SectionTitle eyebrow="Package comparison" title="Pick the right starting point before we scope deeper" />
-          <Link href="/waskizone/contact" className="inline-flex items-center gap-2 bg-mint px-4 py-3 font-bold text-ink hover:bg-white">Request proposal<ArrowUpRight size={16} /></Link>
+          <a href="https://waskizone.vercel.app/contact" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 bg-mint px-4 py-3 font-bold text-ink hover:bg-white">Request proposal<ArrowUpRight size={16} /></a>
         </div>
         <div className="mt-10 overflow-x-auto border border-white/10 bg-panel/70">
           <table className="min-w-[860px] w-full border-collapse text-left text-sm">
@@ -89,7 +88,7 @@ export function AuthorizedSecurityPolicyBlock() {
   return (
     <section className="mx-auto max-w-7xl px-5 py-20 lg:px-8">
       <div className="grid gap-10 lg:grid-cols-[0.38fr_0.62fr]">
-        <div><SectionTitle eyebrow="Authorized security only" title="Professional boundaries for cybersecurity work" /><p className="mt-5 text-sm leading-7 text-white/62">Security work under WaskiZone/W4sk1Z0n3 is scoped, authorized, documented, and defensive.</p><Link href="/waskizone/policy" className="mt-7 inline-flex items-center gap-2 border border-mint/30 px-4 py-3 font-bold text-mint hover:bg-mint hover:text-ink">Read policy<ArrowUpRight size={16} /></Link></div>
+        <div><SectionTitle eyebrow="Authorized security only" title="Professional boundaries for cybersecurity work" /><p className="mt-5 text-sm leading-7 text-white/62">Security work under WaskiZone/W4sk1Z0n3 is scoped, authorized, documented, and defensive.</p><a href="https://waskizone.vercel.app/policy/authorized-security" target="_blank" rel="noopener noreferrer" className="mt-7 inline-flex items-center gap-2 border border-mint/30 px-4 py-3 font-bold text-mint hover:bg-mint hover:text-ink">Read policy<ArrowUpRight size={16} /></a></div>
         <div className="grid gap-3 sm:grid-cols-2">{waskiSecurityPolicy.map((item) => <article key={item.title} className="border border-white/10 bg-panel/70 p-5"><LockKeyhole className="text-mint" size={18} /><h3 className="mt-4 text-xl font-black text-white">{item.title}</h3><p className="mt-3 text-sm leading-7 text-white/62">{item.detail}</p></article>)}</div>
       </div>
     </section>
