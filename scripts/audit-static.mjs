@@ -6,7 +6,7 @@ const checks = [
   ["Root metadata", "app/layout.tsx", "metadataBase"],
   ["Security headers", "next.config.ts", "X-Frame-Options"],
   ["Contact rate limit", "app/api/contact/route.ts", "Too many messages"],
-  ["Sitemap includes services", "app/sitemap.ts", "waskiServiceDetails"],
+  ["WaskiZone uses live company domain", "lib/portfolio-data.ts", "https://waskizone.com"],
   ["Global focus style", "app/globals.css", ":focus-visible"],
   ["Reduced motion", "app/globals.css", "prefers-reduced-motion"],
   ["Runtime error boundary", "app/error.tsx", "Something failed to load cleanly"],
