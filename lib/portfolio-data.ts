@@ -20,7 +20,7 @@ import {
   Users,
 } from "lucide-react";
 
-export const waskiZoneSiteUrl = "https://waskizone.vercel.app";
+export const waskiZoneSiteUrl = "https://waskizone.com";
 
 export const navItems = ["Identity", "Modes", "Status", "Case Files", "Evidence", "Lab", "Writeups", "WaskiZone", "Contact"];
 
