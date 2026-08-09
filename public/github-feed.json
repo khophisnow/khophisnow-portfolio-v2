@@ -1,7 +1,23 @@
 {
-  "updatedAt": "2026-08-09T02:26:37.128Z",
+  "updatedAt": "2026-08-09T13:13:20.947Z",
   "source": "https://github.com/khophisnow",
   "items": [
+    {
+      "id": "17193448498",
+      "title": "Portfolio update",
+      "summary": "Updated project code",
+      "repo": "khophisnow/khophisnow-portfolio-v2",
+      "url": "https://github.com/khophisnow/khophisnow-portfolio-v2",
+      "publishedAt": "2026-08-09T12:43:54Z"
+    },
+    {
+      "id": "17190482122",
+      "title": "Portfolio update",
+      "summary": "Updated project code",
+      "repo": "khophisnow/khophisnow-portfolio-v2",
+      "url": "https://github.com/khophisnow/khophisnow-portfolio-v2",
+      "publishedAt": "2026-08-09T12:00:03Z"
+    },
     {
       "id": "15202673105",
       "title": "Portfolio update",
@@ -33,22 +49,6 @@
       "repo": "khophisnow/khophisnow-portfolio-v2",
       "url": "https://github.com/khophisnow/khophisnow-portfolio-v2",
       "publishedAt": "2026-07-16T02:21:28Z"
-    },
-    {
-      "id": "15068736632",
-      "title": "Portfolio update",
-      "summary": "Updated project code",
-      "repo": "khophisnow/khophisnow-portfolio-v2",
-      "url": "https://github.com/khophisnow/khophisnow-portfolio-v2",
-      "publishedAt": "2026-07-16T01:14:04Z"
-    },
-    {
-      "id": "15002995891",
-      "title": "Portfolio update",
-      "summary": "Updated project code",
-      "repo": "khophisnow/khophisnow-portfolio-v2",
-      "url": "https://github.com/khophisnow/khophisnow-portfolio-v2",
-      "publishedAt": "2026-07-15T03:00:13Z"
     }
   ]
 }
